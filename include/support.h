@@ -4,14 +4,11 @@
 #include <stdlib/stdint.h>
 
 extern "C" {
-    // sends data to the HW port
-    void outb(uint16_t port, uint8_t data);
-
-    // reads data from the HW port
-    char inb(uint16_t port);
-
-    // halts the CPU
-    void halt();
+    void _outb(uint16_t port, uint8_t data);
+    char _inb(uint16_t port);
+    void _halt();
+    void _load_gdt(uint32_t addr);
+    void _load_idt(uint32_t addr);
 }
 
 #endif

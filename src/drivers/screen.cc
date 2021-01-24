@@ -7,11 +7,9 @@
 
 static uint8_t color_ctrl;
 
-void set_cursor_offset(uint16_t offset);
 static void set_cursor_offset_pos(int16_t y, int16_t x);
 static uint16_t kprint_char_at(char c, uint8_t y, uint8_t x);
 static void kprint_char(char c);
-static uint16_t get_cursor_offset();
 static void scroll_down();
 
 void set_color(uint8_t val) {
@@ -162,7 +160,7 @@ void kprintf(const char *str, ...) {
     uint32_t i;
     uint32_t args_count = 0;
     va_list valist;
-    char buffer[32];
+    char buffer[128];
     int value;
     double d_value;
 
@@ -222,18 +220,18 @@ void kprintf(const char *str, ...) {
 
 void set_cursor_offset(uint16_t offset) {
     offset >>= 1;
-    outb(REGISTER_SCREEN_CTRL, 14);
-    outb(REGISTER_SCREEN_DATA, (uint8_t)(offset >> 8));
-    outb(REGISTER_SCREEN_CTRL, 15);
-    outb(REGISTER_SCREEN_DATA, (uint8_t)(offset & 0xFF));
+    _outb(REGISTER_SCREEN_CTRL, 14);
+    _outb(REGISTER_SCREEN_DATA, (uint8_t)(offset >> 8));
+    _outb(REGISTER_SCREEN_CTRL, 15);
+    _outb(REGISTER_SCREEN_DATA, (uint8_t)(offset & 0xFF));
 }
 
-static uint16_t get_cursor_offset() {
+uint16_t get_cursor_offset() {
     uint16_t offset;
-    outb(REGISTER_SCREEN_CTRL, 14);
-    offset = inb(REGISTER_SCREEN_DATA);
+    _outb(REGISTER_SCREEN_CTRL, 14);
+    offset = _inb(REGISTER_SCREEN_DATA);
     offset <<= 8;
-    outb(REGISTER_SCREEN_CTRL, 15);
-    offset += inb(REGISTER_SCREEN_DATA);
+    _outb(REGISTER_SCREEN_CTRL, 15);
+    offset += _inb(REGISTER_SCREEN_DATA);
     return offset << 1;
 }

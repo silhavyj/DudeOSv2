@@ -11,7 +11,7 @@
 #define REGISTER_SCREEN_CTRL 0x3d4
 #define REGISTER_SCREEN_DATA 0x3d5
 
-#define DEFAULT_COLOR FOREGROUND_WHITE | BACKGROUND_BLUE
+#define DEFAULT_COLOR FOREGROUND_WHITE | BACKGROUND_BLACK
 #define ERROR_COLOR FOREGROUND_WHITE | BACKGROUND_RED
 #define ERR_SYMBOL 'E'
 
@@ -20,6 +20,7 @@
 #define POS_X(offset) ((uint8_t)(((offset) - (POS_Y((offset)) * 2 * MAX_COLS)) / 2))
 
 void set_cursor_offset(uint16_t offset);
+uint16_t get_cursor_offset();
 void clear_screen();
 void color_screen(uint8_t color);
 void init_screen_driver();
