@@ -64,3 +64,21 @@ _load_idt:
     lidt    [eax]               ; load the address
     ret                         ; return back
 ;---------------------------------------
+
+;---------------------------------------
+; enable_interrupts - enables interrupts
+;---------------------------------------
+[global _enable_interrupts]
+_enable_interrupts:
+    sti                         ; enable interrupts
+    ret                         ; return back
+;---------------------------------------
+
+;---------------------------------------
+; disable_interrupts - enables interrupts
+;---------------------------------------
+[global _disable_interrupts]
+_disable_interrupts:
+    cli                         ; disable interrupts
+    ret                         ; return back
+;---------------------------------------

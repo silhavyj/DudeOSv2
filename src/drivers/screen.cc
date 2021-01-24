@@ -105,7 +105,7 @@ uint32_t i;
                             kputs(va_arg(valist, char *));
                             break;
                         case 'c':
-                            *buffer = va_arg(valist, char);
+                            buffer[0] = va_arg(valist, int);
                             buffer[1] = '\0';
                             kputs(buffer);
                             break;

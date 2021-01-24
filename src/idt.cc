@@ -1,7 +1,9 @@
 #include <idt.h>
+#include <irq.h>
 #include <gdt.h>
 #include <support.h>
 #include <drivers/screen.h>
+#include <drivers/keyboard.h>
 
 IDT_descriptor_t idt_desc;
 IDT_entry_t idt[IDT_ENTRIES_NUM];
@@ -64,10 +66,14 @@ void _int0x80_handler(int_registers_t regs) {
 
 // PIT (system timer) handler
 void _int0x20_handler(int_registers_t regs) {
+    _outb(PIC1_PORT, PIC_ACK);
 }
 
 // keyboard handler
 void _int0x21_handler(int_registers_t regs) {
+    uint8_t scancode = _inb(KEYBOARD_DATA_PORT);
+    process_key(scancode);
+    _outb(PIC1_PORT, PIC_ACK);
 }
 
  // double fault

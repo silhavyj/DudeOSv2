@@ -5,13 +5,15 @@
 
 #define TIMER_FREQUENCY 20
 
-#define PIC1_PORT 0x20 // master pic command port
-#define PIC2_PORT 0xA0 // slave pic command port
+#define PIC_ACK      0x20
+
+#define PIC1_PORT    0x20 // master pic command port
+#define PIC2_PORT    0xA0 // slave pic command port
 
 #define PIT_CMD_PORT 0x43
-#define PIT0_PORT    0x40
+#define PIT0_PORT    0x40 //1 channel port
 
 void remap_irq();
-void init_timer(uint32_t frequency);
+void init_timer();
 
 #endif  

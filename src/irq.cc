@@ -19,8 +19,8 @@ void remap_irq() {
     _outb(PIC2_PORT + 1, 0xFF);
 }
 
-void init_timer(uint32_t frequency) {
-    uint32_t divisor = 1193180 / frequency;
+void init_timer() {
+    uint32_t divisor = 1193180 / (uint32_t)TIMER_FREQUENCY;
     uint8_t low_byte = divisor & 0xFF;
     uint8_t high_byte = (divisor >> 8) & 0xFF;
 
