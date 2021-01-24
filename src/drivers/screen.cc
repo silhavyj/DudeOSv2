@@ -1,16 +1,12 @@
 #include <drivers/screen.h>
-#include <stdlib/math.h>
 #include <stdlib/string.h>
 #include <stdlib/stdarg.h>
 #include <stdlib/memory.h>
 #include <support.h>
 
-static uint8_t color_ctrl;
-
-static void set_cursor_offset_pos(int16_t y, int16_t x);
-static uint16_t kprint_char_at(char c, uint8_t y, uint8_t x);
-static void kprint_char(char c);
-static void scroll_down();
+uint8_t color_ctrl;
+uint32_t current_cursor_pos;
+uint16_t video_memory_segment = 0x18;
 
 void set_color(uint8_t val) {
     color_ctrl = val;
@@ -20,144 +16,65 @@ void reset_color() {
     color_ctrl = DEFAULT_COLOR;
 }
 
-void init_screen_driver() {
-    clear_screen();
-    reset_color();
-}
-
-static void set_cursor_offset_pos(int16_t y, int16_t x) {
-    y = min(max(0, y), MAX_ROWS - 1);
-    x = min(max(0, x), MAX_COLS - 1);
-    uint32_t offset = OFFSET(y, x);
-    set_cursor_offset(offset);
-}
-
-void move_cursor_up() {
-    uint32_t offset = get_cursor_offset();
-    set_cursor_offset_pos(POS_Y(offset) - 1, POS_X(offset));
-}
-
-void move_cursor_down() {
-    uint32_t offset = get_cursor_offset();
-    set_cursor_offset_pos(POS_Y(offset) + 1, POS_X(offset));
-}
-
-void move_cursor_right() {
-    uint32_t offset = get_cursor_offset();
-    set_cursor_offset_pos(POS_Y(offset), POS_X(offset) + 1);
-}
-
-void move_cursor_left() {
-    uint32_t offset = get_cursor_offset();
-    set_cursor_offset_pos(POS_Y(offset), POS_X(offset) - 1);
-}
-
-void color_screen(uint8_t color) {
-    uint16_t i;
-    char *video_memory = (char *)VIDEO_MEMORY;
-    uint16_t screen_size = MAX_COLS * MAX_ROWS;
-
-    for (i = 0; i < screen_size; i++) {
-        video_memory[i * 2] = ' ';
-        video_memory[i * 2 + 1] = color;
-    }
-    set_cursor_offset(OFFSET(0, 0));
+void set_video_memory_segment(uint16_t seg) {
+    video_memory_segment = seg;
 }
 
 void clear_screen() {
-    uint16_t i;
-    char *video_memory = (char *)VIDEO_MEMORY;
-    uint16_t screen_size = MAX_COLS * MAX_ROWS;
-
-    for (i = 0; i < screen_size; i++) {
-        video_memory[i * 2] = ' ';
-        video_memory[i * 2 + 1] = DEFAULT_COLOR;
-    }
-    set_cursor_offset(OFFSET(0, 0));
+    reset_color();
+    current_cursor_pos = 0;
+    console_scroll(MAX_ROWS);
 }
 
-static void kprint_char(char c) {
-    uint16_t offset = get_cursor_offset();
-    uint8_t y = POS_Y(offset);
-    uint8_t x = POS_X(offset);
-    kprint_char_at(c, y, x);
+void console_scroll(uint32_t lines_count) {
+    uint32_t bytes_to_cpy = (MAX_ROWS - lines_count) * MAX_COLS * BYTES_PER_SYMBOL;
+    uint32_t spaces_to_fill = lines_count * MAX_COLS * BYTES_PER_SYMBOL;
+    uint32_t copy_start = MAX_COLS * lines_count * BYTES_PER_SYMBOL;
+    uint32_t spaces_start = (MAX_ROWS - lines_count) * MAX_COLS * BYTES_PER_SYMBOL;
+
+    asm (
+        "mov %2, %%ax;"
+        "mov %%ax, %%es;"
+        "mov %0, %%ecx;"
+        "mov %1, %%esi;"
+        "xor %%edi, %%edi;"
+        "rep movsb %%es:(%%esi), %%es:(%%edi)"
+        : : "g" (bytes_to_cpy), "g" (copy_start), "m" (video_memory_segment)
+        : "eax", "ecx", "edi", "esi"
+    );
+
+    asm (
+        "mov $0x00, %%al;"
+        "mov %0, %%ecx;"
+        "mov %1, %%edi;"
+        "rep stosb"
+        : : "r" (spaces_to_fill), "r" (spaces_start)
+        : "eax", "ecx", "edi"
+    );
 }
 
-static uint16_t kprint_char_at(char c, uint8_t y, uint8_t x) {
-    char *video_memory = (char *)VIDEO_MEMORY;
-    uint16_t offset;
-
-    if (y >= MAX_ROWS || x >= MAX_COLS) {
-        offset = 2 * MAX_COLS * MAX_ROWS;
-        video_memory[offset - 2] = ERR_SYMBOL;
-        video_memory[offset - 1] = ERROR_COLOR;
-        return OFFSET(MAX_ROWS, MAX_COLS);
-    }
-    offset = OFFSET(y, x);
-    switch (c) {
-        case '\n':
-            offset = OFFSET(y + 1, 0);
-            break;
-        case 0x08:
-            video_memory[offset] = ' ';
-            video_memory[offset + 1] = color_ctrl;
-            break;
-        default:
-            video_memory[offset] = c;
-            video_memory[offset + 1] = color_ctrl;
-            offset += 2;
-            break;
-    }
-    if (offset >= 2 * MAX_ROWS * MAX_COLS) {
-        scroll_down();
-        char *last_line = (char *)(OFFSET(MAX_ROWS - 1, 0) + VIDEO_MEMORY);
-        uint32_t i;
-        for (i = 0; i < 2 * MAX_COLS; i += 2) {
-            last_line[i] = 0;
-            last_line[i+1] = color_ctrl;
-        }
-        offset -= 2 * MAX_COLS;
-    }
-    set_cursor_offset(offset);
-    return offset;
-}
-
-void kprint_backspace() {
-    uint32_t offset = get_cursor_offset() - 2;
-    uint8_t y = POS_Y(offset);
-    uint8_t x = POS_X(offset);
-    kprint_char_at(0x08, y, x);
-}
-
-static void scroll_down() {
-    uint32_t i;
-    for (i = 1; i < MAX_ROWS; i++) {
-        char *src = (char *)(OFFSET(i, 0) + VIDEO_MEMORY);
-        char *dest = (char *)(OFFSET(i - 1, 0) + VIDEO_MEMORY);
-        memcpy(src, dest, 2 * MAX_COLS);
-    }
-}
-
-void kprintf_at(const char *str, uint8_t y, uint8_t x) {
-    uint16_t offset = OFFSET(y, x);
-    uint32_t i;
-
-    for (i = 0; str[i] != '\0'; ) {
-        offset = kprint_char_at(str[i++], y, x);
-        y = POS_Y(offset);
-        x = POS_X(offset);
-    }
-}
-
-void kprint_str(char *str) {
-    uint16_t offset = get_cursor_offset();
-    uint8_t y = POS_Y(offset);
-    uint8_t x = POS_X(offset);
-    kprintf_at(str, y, x);
+void kprint_symbol(char symb, uint32_t pos) {
+    asm (
+        "mov %2, %%ax;"
+        "mov %%ax, %%es;"
+        "movb %0, %%es:(%1);"
+        "movb $0x07, %%es:1(%1);"
+        : : "r" (symb), "r" (pos), "r" (video_memory_segment)
+        : "eax"
+    );
+    asm (
+        "mov %2, %%ax;"
+        "mov %%ax, %%es;"
+        "movb %0, %%es:(%1);"
+        "movb $0x07, %%es:1(%1);"
+        : : "r" (color_ctrl), "r" (pos + 1), "r" (video_memory_segment)
+        : "eax"
+    );
+    set_cursor_offset(pos);
 }
 
 void kprintf(const char *str, ...) {
-    uint32_t i;
+uint32_t i;
     uint32_t args_count = 0;
     va_list valist;
     char buffer[128];
@@ -182,28 +99,29 @@ void kprintf(const char *str, ...) {
                         case 'd':
                             value = va_arg(valist, int32_t);
                             int_to_str(buffer, value, 10);
-                            kprint_str(buffer);
+                            kprint(buffer);
                             break;
                         case 's':
-                            kprint_str(va_arg(valist, char *));
+                            kprint(va_arg(valist, char *));
                             break;
                         case 'c':
                             *buffer = va_arg(valist, char);
-                            kprint_char(buffer[0]);
+                            buffer[1] = '\0';
+                            kprint(buffer);
                             break;
                         case 'x':
                             value = va_arg(valist, int32_t);
                             int_to_str(buffer, value, 16);
-                            kprint_str(buffer);
+                            kprint(buffer);
                             break;
                         case 'f':
                             d_value = va_arg(valist, double);
                             double_to_ascii(d_value, buffer, 3);
-                            kprint_str(buffer);
+                            kprint(buffer);
                             break;
                         default:
                             set_color(ERROR_COLOR);
-                            kprint_str("ERROR\n");
+                            kprint("ERROR\n");
                             reset_color();
                             return;
                     }
@@ -214,24 +132,51 @@ void kprintf(const char *str, ...) {
                 }
             }
         }
-        kprint_char(str[i]);
+        buffer[0] = str[i];
+        buffer[1] = '\0';
+        kprint(buffer);
     }
 }
 
+void kprint(const char *str) {
+    current_cursor_pos = kprint_str(str, current_cursor_pos);
+}
+
+uint32_t kprint_str(const char* message, uint32_t cursor) {
+    uint32_t i, j = 0;
+    uint32_t line;
+
+    i = cursor;
+    line = cursor / BYTES_PER_SYMBOL / MAX_COLS;
+
+    while (message[j] != 0) {
+        if (message[j] == '\n') {
+            line++;
+            if (line >= MAX_ROWS) {
+                console_scroll(1);
+                line--;
+            }
+            i = line * MAX_COLS * BYTES_PER_SYMBOL;
+            j++;
+            set_cursor_offset(i);
+        } else {
+            kprint_symbol(message[j], i);
+            j++;
+            i += BYTES_PER_SYMBOL;
+        }
+    }
+    return i;
+}
+
 void set_cursor_offset(uint16_t offset) {
+    current_cursor_pos = offset;
     offset >>= 1;
-    _outb(REGISTER_SCREEN_CTRL, 14);
+    _outb(REGISTER_SCREEN_CTRL, CURSOR_HIGH_BYTE_COMMAND);
     _outb(REGISTER_SCREEN_DATA, (uint8_t)(offset >> 8));
-    _outb(REGISTER_SCREEN_CTRL, 15);
+    _outb(REGISTER_SCREEN_CTRL, CURSOR_LOW_BYTE_COMMAND);
     _outb(REGISTER_SCREEN_DATA, (uint8_t)(offset & 0xFF));
 }
 
 uint16_t get_cursor_offset() {
-    uint16_t offset;
-    _outb(REGISTER_SCREEN_CTRL, 14);
-    offset = _inb(REGISTER_SCREEN_DATA);
-    offset <<= 8;
-    _outb(REGISTER_SCREEN_CTRL, 15);
-    offset += _inb(REGISTER_SCREEN_DATA);
-    return offset << 1;
+    return current_cursor_pos;
 }
