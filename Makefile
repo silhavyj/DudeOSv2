@@ -32,6 +32,13 @@ $(OS_IMAGE) : $(OBJ_FILES)
 %.o : %.asm
 	nasm -f elf $^
 
+.PHONY install-dependencies:
+install-dependencies:
+	sudo apt-get update
+	sudo apt-get install build-essential
+	sudo apt-get install nasm
+	sudo apt-get install qemu-system-i386
+
 .PHONY run:
 run: $(OS_IMAGE)
 	qemu-system-i386 $^
