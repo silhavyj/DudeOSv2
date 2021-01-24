@@ -15,5 +15,6 @@ void int_to_str(char *str, int num, int base);
 void int_to_str_10(char *str, int num);
 void int_to_str_16(char *str, int num);
 void int_to_str_02(char *str, int num);
+void double_to_ascii(double num, char *str, uint8_t afterpoint);
 
 #endif

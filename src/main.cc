@@ -4,7 +4,7 @@
 
 extern "C" int _kmain() {
     init_screen_driver();
-    kprintf("Hello :)\n");
+    kprintf("Hello :) %f\n", 15.156);
 
     while (1)
     {

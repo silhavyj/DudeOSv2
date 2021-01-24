@@ -3,6 +3,8 @@
 #include <stdlib/math.h>
 #include <stdlib/limits.h>
 
+static int int_to_ascii_pos(int x, char str[], int pos);
+
 uint32_t strlen(const char *str) {
     uint32_t i = 0;
     while (str[i] != 0)
@@ -36,6 +38,11 @@ void append(char *str, char c) {
     uint32_t len = strlen(str);
     str[len] = c;
     str[len + 1] = '\0';
+}
+
+static int int_to_ascii_pos(int num, char str[], int pos) {
+    int_to_str(str + pos, num, 10);
+    return strlen(str);
 }
 
 void int_to_str(char *str, int num, int base) {
@@ -144,4 +151,21 @@ int find_first_not_of(const char *str, char c) {
         index++;
     }
     return -1;
+}
+
+void double_to_ascii(double num, char *str, uint8_t afterpoint) {
+    uint8_t sign = num < 0;
+    if (sign == 1)
+        str[0] = '-';
+    num = abs(num);
+
+    uint32_t integer_part = (uint32_t)num;
+    double float_part = num - (double)integer_part;
+
+    uint32_t i = int_to_ascii_pos(integer_part, str, sign);
+    if (afterpoint != 0) {
+        append(str, '.');
+        float_part = float_part * pow(10, afterpoint); 
+        int_to_ascii_pos((uint32_t)float_part, str, i + 1); 
+    }
 }

@@ -198,11 +198,11 @@ void kprintf(const char *str, ...) {
                             int_to_str(buffer, value, 16);
                             kprint_str(buffer);
                             break;
-                        /*case 'f':
+                        case 'f':
                             d_value = va_arg(valist, double);
                             double_to_ascii(d_value, buffer, 3);
                             kprint_str(buffer);
-                            break;*/
+                            break;
                         default:
                             set_color(ERROR_COLOR);
                             kprint_str("ERROR\n");
