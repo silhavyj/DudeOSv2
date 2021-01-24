@@ -1,39 +1,112 @@
 #include <idt.h>
+#include <gdt.h>
 #include <support.h>
+#include <drivers/screen.h>
 
 IDT_descriptor_t idt_desc;
 IDT_entry_t idt[IDT_ENTRIES_NUM];
 
+// procedures for individual interrupts
+// these are written in assembly - interrupts.asm
+extern "C" {
+    void _isr0xUnknown();
+    void _isr0x80(void); // system calls
+    void _isr0x20(void); // PIT (system timer)
+    void _isr0x21(void); // keyboard
+    void _isr0x8(void);  // double fault
+    void _isr0xB(void);  // segment not present
+    void _isr0xC(void);  // stack fault
+    void _isr0xD(void);  // general protection fault
+    void _isr0xE(void);  // page fault
+    void _isr0xF(void);  // unknown interrupt
+}
+
 void init_idt() {
     int i;
+
+    // set all interrupts as not preset
+    // we'll set up them individualu furher down below
     for (i = 0; i < IDT_ENTRIES_NUM; i++)
-        idt_set_entry(i, 0, 0, 0, 0, 0, 0xE); // not preset
+        idt_set_entry(i, 0, 0, IDT_NOT_PRESENT, 0, 0, IDT_32_BIT_TRAP_GATE);
 
-    /*idt_set_entry(39, (uint32_t)isr0xUnknown, 0x8, 1, 0, 0, 0xE);
+    // now we can install all interrupt handlers as defined above
+    idt_set_entry(39, (uint32_t)_isr0xUnknown, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE);
+    idt_set_entry(0x8, (uint32_t)_isr0x8, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE);
+    idt_set_entry(0xB, (uint32_t)_isr0xB, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE);
+    idt_set_entry(0xC, (uint32_t)_isr0xC, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE);
+    idt_set_entry(0xD, (uint32_t)_isr0xD, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE);
+    idt_set_entry(0xE, (uint32_t)_isr0xE, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE);
+    idt_set_entry(0xF, (uint32_t)_isr0xF, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE);
 
-    idt_set_entry(0x8, (uint32_t)isr0x8, 0x8, 1, 0, 0, 0xE);
-    idt_set_entry(0xB, (uint32_t)isr0xB, 0x8, 1, 0, 0, 0xE);
-    idt_set_entry(0xC, (uint32_t)isr0xC, 0x8, 1, 0, 0, 0xE);
-    idt_set_entry(0xD, (uint32_t)isr0xD, 0x8, 1, 0, 0, 0xE);
-    idt_set_entry(0xE, (uint32_t)isr0xE, 0x8, 1, 0, 0, 0xE);
-    idt_set_entry(0xF, (uint32_t)isr0xF, 0x8, 1, 0, 0, 0xE);
+    idt_set_entry(0x80, (uint32_t)_isr0x80, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE); // system calls
+    idt_set_entry(0x20, (uint32_t)_isr0x20, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE); // PIT - times
+    idt_set_entry(0x21, (uint32_t)_isr0x21, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE); // keyboard
 
-    idt_set_entry(0x80, (uint32_t)isr0x80, 0x8, 1, 0, 0, 0xE); // sys calls
-    idt_set_entry(0x20, (uint32_t)isr0x20, 0x8, 1, 0, 0, 0xE); // PIT
-    idt_set_entry(0x21, (uint32_t)isr0x21, 0x8, 1, 0, 0, 0xE); // keyboard*/
-
+    // initialize idt desctiptor (size and address)
     idt_desc.limit = sizeof(idt);
-    idt_desc.base = (uint32_t)&idt;
+    idt_desc.base  = (uint32_t)&idt;
+
+    // load desctiptor to the CPU
     _load_idt((uint32_t)&idt_desc);
 }
 
 void idt_set_entry(uint8_t index, uint32_t isr_addr, uint16_t segment, uint8_t present, uint8_t dpl, uint8_t storage_segment, uint8_t get_type) {
-    if (index)
-        return;
-
-    idt[index].offset_low = isr_addr & 0xFFFF;
+    idt[index].offset_low  = isr_addr & 0xFFFF;
     idt[index].offset_high = isr_addr >> 16;
-    idt[index].selector = segment;
-    idt[index].zero = 0;
-    idt[index].type_attr = ((present & 0x1) << 7) | ((dpl & 0x3) << 5) | ((storage_segment & 0x1) << 4) | (get_type & 0xF);
+    idt[index].selector    = segment;
+    idt[index].zero        = 0;
+    idt[index].type_attr   = ((present & 0x1) << 7) | 
+                             ((dpl & 0x3) << 5) | 
+                             ((storage_segment & 0x1) << 4) | 
+                             (get_type & 0xF);
 }
+
+
+void _int0xUnknown_handler(int_registers_t regs) {
+    kprintf("Hello from an interrupt ;)\n");
+}
+
+// system calls handler
+void _int0x80_handler(int_registers_t regs) {
+
+}
+
+// PIT (system timer) handler
+void _int0x20_handler(int_registers_t regs) {
+
+}
+
+// keyboard handler
+void _int0x21_handler(int_registers_t regs) {
+
+}
+
+ // double fault
+void _int0x8_handler() {
+
+}   
+
+// segment not present
+void _int0xB_handler(int_with_err_registers_t regs) {
+
+}
+
+// stack fault
+void _int0xC_handler() {
+
+}   
+
+// general protection fault
+void _int0xD_handler() {
+
+}                     
+
+// page fault
+void _int0xE_handler(uint32_t faulting_addr) {
+
+}   
+
+// unknown interrupt
+void _int0xF_handler() {
+
+}                            
