@@ -1,7 +1,10 @@
-SRC_FILES  	 := $(shell find src -name *.cc)
-SRC_FILES    := $(filter-out src/main.cc,$(SRC_FILES))
-ALL_SRC_FILES = src/main.cc $(SRC_FILES)
-OBJ_FILES	  = $(ALL_SRC_FILES:.cc=.o) src/support.o
+CXX_SRC_FILES  	 := $(shell find src -name *.cc)
+CXX_SRC_FILES    := $(filter-out src/main.cc,$(CXX_SRC_FILES))
+CXX_ALL_SRC_FILES = src/main.cc $(CXX_SRC_FILES)
+ASM_SRC_FILES     = $(shell find src -name *.asm)
+
+OBJ_FILES	  = $(CXX_ALL_SRC_FILES:.cc=.o) \
+			    $(ASM_SRC_FILES:.asm=.o)
 
 KERNEL_MAIN       = _kmain
 OS_IMAGE          = dudeosv2.img

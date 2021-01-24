@@ -1,9 +1,10 @@
-#include <stdio.h>
 #include <support.h>
+#include <stdlib/string.h>
+#include <drivers/screen.h>
 
 extern "C" int _kmain() {
-    clear_creen();
-    kprintf("Hello from the kernel\n");
+    init_screen_driver();
+    kprintf("Hello :)\n");
 
     while (1)
     {

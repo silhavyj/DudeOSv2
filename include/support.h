@@ -1,7 +1,7 @@
 #ifndef _SUPPORT_H_
 #define _SUPPORT_H_
 
-#include <stdint.h>
+#include <stdlib/stdint.h>
 
 extern "C" {
     // sends data to the HW port
