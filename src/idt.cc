@@ -64,40 +64,32 @@ void _int0x80_handler(int_registers_t regs) {
 
 // PIT (system timer) handler
 void _int0x20_handler(int_registers_t regs) {
-
 }
 
 // keyboard handler
 void _int0x21_handler(int_registers_t regs) {
-
 }
 
  // double fault
 void _int0x8_handler() {
-
 }   
 
 // segment not present
 void _int0xB_handler(int_with_err_registers_t regs) {
-
 }
 
 // stack fault
 void _int0xC_handler() {
-
 }   
 
 // general protection fault
 void _int0xD_handler() {
-
 }                     
 
 // page fault
 void _int0xE_handler(uint32_t faulting_addr) {
-
 }   
 
 // unknown interrupt
 void _int0xF_handler() {
-
 }                            

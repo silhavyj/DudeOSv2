@@ -17,8 +17,6 @@ extern "C" int _kmain() {
     init(&init_idt,  "initializing IDT...");
     init(&remap_irq, "remaping IRQs...");
 
-    asm ("int $0x80");
-
     while (1)
     {
     }
