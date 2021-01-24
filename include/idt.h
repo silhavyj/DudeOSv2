@@ -3,6 +3,7 @@
 
 #include <stdlib/stdint.h>
 
+// maximum number of interrupts in the system
 #define IDT_ENTRIES_NUM 256
 
 typedef struct {

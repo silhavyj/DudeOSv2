@@ -3,17 +3,17 @@
 #include <stdlib/memory.h>
 
 GDT_descriptor_t gdt_desc;
-GDT_entry_t gdt[5];
+GDT_entry_t gdt[5]; // for now we define fine different segments
 
 void init_gdt() {
-    // 0x0
+    // 0x0 - the first descriptor entry is always NULL
     memset((char *)&gdt[0], 0, sizeof(GDT_entry_t));
 
     // code 0x8
     gdt[1].limit_low   = 0xFFFF;
     gdt[1].base_low    = 0x0;
     gdt[1].base_middle = 0x0;
-    gdt[1].access      = 0x9A;  //10011010b
+    gdt[1].access      = 0x9A;  //10011010b this section has the execution bit set to 1
     gdt[1].granularity = 0xCF;  //11001111b
     gdt[1].base_high   = 0;
 
@@ -41,8 +41,10 @@ void init_gdt() {
     gdt[4].granularity = 0xCF;  //11001111b
     gdt[4].base_high   = 0x6;
 
-    gdt_desc.size = sizeof(gdt);
+    // initialize the gdt descritor
+    gdt_desc.size       = sizeof(gdt);
     gdt_desc.start_addr = (uint32_t)&gdt[0];
 
+    // load the gdt dectriptor to the CPU
     _load_gdt((uint32_t)&gdt_desc);
 }

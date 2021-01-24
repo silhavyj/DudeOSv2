@@ -8,7 +8,7 @@ OBJ_FILES	  = $(CXX_ALL_SRC_FILES:.cc=.o) \
 
 KERNEL_MAIN       = _kmain
 OS_IMAGE          = dudeosv2.img
-OS_BIN            = dudeosv2.iso
+OS_BIN            = dudeosv2.bin
 KERNEL_START_CODE = 0x6400000
 
 LD          = ld
