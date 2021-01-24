@@ -1,7 +1,7 @@
 SRC_FILES  	 := $(shell find src -name *.cc)
 SRC_FILES    := $(filter-out src/main.cc,$(SRC_FILES))
 ALL_SRC_FILES = src/main.cc $(SRC_FILES)
-OBJ_FILES	  = $(ALL_SRC_FILES:.cc=.o)	
+OBJ_FILES	  = $(ALL_SRC_FILES:.cc=.o) src/support.o
 
 KERNEL_MAIN       = _kmain
 OS_IMAGE          = dudeosv2.img
@@ -25,6 +25,9 @@ $(OS_IMAGE) : $(OBJ_FILES)
 
 %.o : %.cc
 	$(CXX) $(CXX_FLAGS) -c $^ -o $@
+
+%.o : %.asm
+	nasm -f elf $^
 
 .PHONY run:
 run: $(OS_IMAGE)

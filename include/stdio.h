@@ -16,9 +16,4 @@ void kprintf(const char *str, ...);
 void kprint(const char *str);
 uint32_t kprint_str(const char* message, uint32_t cursor);
 
-void outb(uint16_t port, uint8_t data);
-void outw(uint16_t port, uint16_t word);
-void outd(uint16_t port, uint32_t dword);
-uint8_t inb(uint16_t port);
-
 #endif

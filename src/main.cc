@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <support.h>
 
 extern "C" int _kmain() {
     clear_creen();
