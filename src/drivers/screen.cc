@@ -53,7 +53,7 @@ void console_scroll(uint32_t lines_count) {
     );
 }
 
-void kprint_symbol(char symb, uint32_t pos) {
+void kputc(char symb, uint32_t pos) {
     asm (
         "mov %2, %%ax;"
         "mov %%ax, %%es;"
@@ -99,29 +99,29 @@ uint32_t i;
                         case 'd':
                             value = va_arg(valist, int32_t);
                             int_to_str(buffer, value, 10);
-                            kprint(buffer);
+                            kputs(buffer);
                             break;
                         case 's':
-                            kprint(va_arg(valist, char *));
+                            kputs(va_arg(valist, char *));
                             break;
                         case 'c':
                             *buffer = va_arg(valist, char);
                             buffer[1] = '\0';
-                            kprint(buffer);
+                            kputs(buffer);
                             break;
                         case 'x':
                             value = va_arg(valist, int32_t);
                             int_to_str(buffer, value, 16);
-                            kprint(buffer);
+                            kputs(buffer);
                             break;
                         case 'f':
                             d_value = va_arg(valist, double);
                             double_to_ascii(d_value, buffer, 3);
-                            kprint(buffer);
+                            kputs(buffer);
                             break;
                         default:
                             set_color(ERROR_COLOR);
-                            kprint("ERROR\n");
+                            kputs("ERROR\n");
                             reset_color();
                             return;
                     }
@@ -134,11 +134,11 @@ uint32_t i;
         }
         buffer[0] = str[i];
         buffer[1] = '\0';
-        kprint(buffer);
+        kputs(buffer);
     }
 }
 
-void kprint(const char *str) {
+void kputs(const char *str) {
     current_cursor_pos = kprint_str(str, current_cursor_pos);
 }
 
@@ -160,7 +160,7 @@ uint32_t kprint_str(const char* message, uint32_t cursor) {
             j++;
             set_cursor_offset(i);
         } else {
-            kprint_symbol(message[j], i);
+            kputc(message[j], i);
             j++;
             i += BYTES_PER_SYMBOL;
         }

@@ -23,9 +23,9 @@
 void set_video_memory_segment(uint16_t seg);
 void clear_screen();
 void console_scroll(uint32_t lines_count);
-void kprint_symbol(char symb, uint32_t pos);
+void kputc(char symb, uint32_t pos);
+void kputs(const char *str);
 void kprintf(const char *str, ...);
-void kprint(const char *str);
 uint32_t kprint_str(const char* message, uint32_t cursor);
 void set_color(uint8_t val);
 void reset_color();
