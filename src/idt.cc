@@ -9,7 +9,6 @@ IDT_entry_t idt[IDT_ENTRIES_NUM];
 // procedures for individual interrupts
 // these are written in assembly - interrupts.asm
 extern "C" {
-    void _isr0xUnknown();
     void _isr0x80(void); // system calls
     void _isr0x20(void); // PIT (system timer)
     void _isr0x21(void); // keyboard
@@ -29,8 +28,6 @@ void init_idt() {
     for (i = 0; i < IDT_ENTRIES_NUM; i++)
         idt_set_entry(i, 0, 0, IDT_NOT_PRESENT, 0, 0, IDT_32_BIT_TRAP_GATE);
 
-    // now we can install all interrupt handlers as defined above
-    idt_set_entry(39, (uint32_t)_isr0xUnknown, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE);
     idt_set_entry(0x8, (uint32_t)_isr0x8, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE);
     idt_set_entry(0xB, (uint32_t)_isr0xB, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE);
     idt_set_entry(0xC, (uint32_t)_isr0xC, CODE_SEGMENT, IDT_PRESENT, 0, 0, IDT_32_BIT_INTERRUPT_GATE);
@@ -61,14 +58,8 @@ void idt_set_entry(uint8_t index, uint32_t isr_addr, uint16_t segment, uint8_t p
                              (get_type & 0xF);
 }
 
-
-void _int0xUnknown_handler(int_registers_t regs) {
-    kprintf("Hello from an interrupt ;)\n");
-}
-
 // system calls handler
 void _int0x80_handler(int_registers_t regs) {
-
 }
 
 // PIT (system timer) handler

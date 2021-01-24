@@ -68,7 +68,6 @@ void idt_set_entry(uint8_t index, uint32_t isr_addr, uint16_t segment, uint8_t p
 // like storing registers on the stack, swiching the segment, ...
 // see interrupts.asm
 extern "C" {
-    void _int0xUnknown_handler(int_registers_t regs);
     void _int0x80_handler(int_registers_t regs);         // system calls
     void _int0x20_handler(int_registers_t regs);         // PIT (system timer)
     void _int0x21_handler(int_registers_t regs);         // keyboard
