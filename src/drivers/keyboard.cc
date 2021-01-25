@@ -65,6 +65,7 @@ void process_key(uint8_t scan_code) {
     } else if (symbol == ENTER_KEY_CODE) {
         // TODO wake up a process waiting for a keyboard interrupt
         keyboard_buff_pos = 0;
+        kprintf("\n");
     }
     else if (pressed && symbol != 0) {
         kprintf("%c", symbol);
