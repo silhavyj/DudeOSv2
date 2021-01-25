@@ -31,5 +31,6 @@ void set_color(uint8_t val);
 void reset_color();
 void set_cursor_offset(uint16_t offset);
 uint16_t get_cursor_offset();
+void print_backspace();
 
 #endif

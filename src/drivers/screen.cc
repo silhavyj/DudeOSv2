@@ -33,21 +33,21 @@ void console_scroll(uint32_t lines_count) {
     uint32_t spaces_start = (MAX_ROWS - lines_count) * MAX_COLS * BYTES_PER_SYMBOL;
 
     asm (
-        "mov %2, %%ax;"
-        "mov %%ax, %%es;"
-        "mov %0, %%ecx;"
-        "mov %1, %%esi;"
-        "xor %%edi, %%edi;"
-        "rep movsb %%es:(%%esi), %%es:(%%edi)"
+        "mov    %2, %%ax;"
+        "mov    %%ax, %%es;"
+        "mov    %0, %%ecx;"
+        "mov    %1, %%esi;"
+        "xor    %%edi, %%edi;"
+        "rep    movsb %%es:(%%esi), %%es:(%%edi)"
         : : "g" (bytes_to_cpy), "g" (copy_start), "m" (video_memory_segment)
         : "eax", "ecx", "edi", "esi"
     );
 
     asm (
-        "mov $0x00, %%al;"
-        "mov %0, %%ecx;"
-        "mov %1, %%edi;"
-        "rep stosb"
+        "mov    $0x00, %%al;"
+        "mov    %0, %%ecx;"
+        "mov    %1, %%edi;"
+        "rep    stosb"
         : : "r" (spaces_to_fill), "r" (spaces_start)
         : "eax", "ecx", "edi"
     );
@@ -55,22 +55,26 @@ void console_scroll(uint32_t lines_count) {
 
 void kputc(char symb, uint32_t pos) {
     asm (
-        "mov %2, %%ax;"
-        "mov %%ax, %%es;"
-        "movb %0, %%es:(%1);"
-        "movb $0x07, %%es:1(%1);"
+        "mov    %2, %%ax;"
+        "mov    %%ax, %%es;"
+        "movb   %0, %%es:(%1);"
+        "movb   $0x07, %%es:1(%1);"
         : : "r" (symb), "r" (pos), "r" (video_memory_segment)
         : "eax"
     );
-    asm (
-        "mov %2, %%ax;"
-        "mov %%ax, %%es;"
-        "movb %0, %%es:(%1);"
-        "movb $0x07, %%es:1(%1);"
+    /*asm (
+        "mov    %2, %%ax;"
+        "mov    %%ax, %%es;"
+        "movb   %0, %%es:(%1);"
+        "movb   $0x07, %%es:1(%1);"
         : : "r" (color_ctrl), "r" (pos + 1), "r" (video_memory_segment)
         : "eax"
-    );
+    );*/
     set_cursor_offset(pos);
+}
+
+void print_backspace() {
+    kputc(' ', current_cursor_pos - 2);
 }
 
 void kprintf(const char *str, ...) {

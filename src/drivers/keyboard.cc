@@ -6,9 +6,9 @@
 char keyboard_buffer[256];
 uint8_t keyboard_buff_pos = 0;
 
-uint8_t shift_on = 0;
-uint8_t ctrl_on = 0;
-uint8_t alt_on = 0;
+uint8_t shift_on    = 0;
+uint8_t ctrl_on     = 0;
+uint8_t alt_on      = 0;
 uint8_t capslock_on = 0;
 
 void init_keyboard() {
@@ -18,7 +18,7 @@ void init_keyboard() {
 void process_key(uint8_t scan_code) {
     uint8_t pressed;
     char symbol = convert_scan_code(scan_code, &pressed);
-    if (pressed) {
+    if (pressed && symbol != 0) {
         kprintf("%c", symbol);
         
         // todo fix overflow
@@ -36,19 +36,23 @@ unsigned char convert_scan_code(uint8_t scan_code, uint8_t *pressed) {
     *pressed = (scan_code & 0x80) ? 1 : 0;
 
     switch (original_scancode) {
-        case 0x36:
-        case 0x2A:
+        case KEY_CODE_LEFT_SHIFT:
+        case KEY_CODE_RIGHT_SHIFT:
             shift_on = !(*pressed);
             return 0;
-        case 0x1D:
+        case KEY_CODE_CTRL:
             ctrl_on = !(*pressed);
             return 0;
-        case 0x38:
+        case KEY_CODE_ALT:
             alt_on = !(*pressed);
             return 0;
-        case 0x3A:
+        case KEY_CODE_CAPSLOCK:
             if (*pressed)
                 capslock_on = !capslock_on;
+            return 0;
+        case KEY_CODE_BACK_SPACE:
+            if (*pressed)
+                print_backspace();
             return 0;
     }
     if (shift_on) {
