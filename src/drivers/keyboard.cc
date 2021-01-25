@@ -3,17 +3,13 @@
 #include <drivers/screen.h>
 #include <stdlib/memory.h>
 
-char keyboard_buffer[256];
+char keyboard_buffer[KEYBOARD_BUFF_SIZE];
 uint8_t keyboard_buff_pos = 0;
 
 uint8_t shift_on    = 0;
 uint8_t ctrl_on     = 0;
 uint8_t alt_on      = 0;
 uint8_t capslock_on = 0;
-
-void init_keyboard() {
-    memset(keyboard_buffer, 0, sizeof(keyboard_buffer));
-}
 
 unsigned char convert_scan_code(uint8_t scan_code, uint8_t *pressed) {
     int original_scancode = scan_code & 0x7F;
@@ -36,7 +32,16 @@ unsigned char convert_scan_code(uint8_t scan_code, uint8_t *pressed) {
             return 0;
         case KEY_CODE_BACK_SPACE:
             if (*pressed)
-                print_backspace();
+               return KEY_CODE_BACK_SPACE;
+            return 0;
+        case KEY_CODE_LEFT_ARROW:
+        case KEY_CODE_RIGHT_ARROW:
+        case KEY_CODE_UP_ARROW:
+        case KEY_CODE_DOWN_ARROW:
+            return 0;
+        case ENTER_KEY_CODE:
+            if (*pressed)
+                return ENTER_KEY_CODE;
             return 0;
     }
     if (shift_on) {
@@ -52,15 +57,23 @@ unsigned char convert_scan_code(uint8_t scan_code, uint8_t *pressed) {
 void process_key(uint8_t scan_code) {
     uint8_t pressed;
     char symbol = convert_scan_code(scan_code, &pressed);
-    if (pressed && symbol != 0) {
-        kprintf("%c", symbol);
-        
-        // todo fix overflow
-        /* keyboard_buffer[keyboard_buff_pos++] = symbol;
-        if (symbol == '\n') {
-            keyboard_buffer[keyboard_buff_pos - 1] = 0;
-            keyboard_create_recource(keyboard_buffer);
-            keyboard_buff_pos = 0;
-        } */
+
+    if (symbol == KEY_CODE_BACK_SPACE) {
+        print_backspace();
+        if (keyboard_buff_pos > 0)
+            keyboard_buff_pos--;
+    } else if (symbol == ENTER_KEY_CODE) {
+        // TODO wake up a process waiting for a keyboard interrupt
+        keyboard_buff_pos = 0;
     }
+    else if (pressed && symbol != 0) {
+        kprintf("%c", symbol);
+        keyboard_buffer[keyboard_buff_pos++] = symbol;
+        if (keyboard_buff_pos == KEYBOARD_BUFF_SIZE)
+            keyboard_buff_pos = 0;
+    }
+}
+
+void init_keyboard() {
+    memset(keyboard_buffer, 0, sizeof(keyboard_buffer));
 }
