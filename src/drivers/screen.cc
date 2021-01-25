@@ -39,7 +39,9 @@ void console_scroll(uint32_t lines_count) {
         "mov    %1, %%esi;"
         "xor    %%edi, %%edi;"
         "rep    movsb %%es:(%%esi), %%es:(%%edi)"
-        : : "g" (bytes_to_cpy), "g" (copy_start), "m" (video_memory_segment)
+        : : "g" (bytes_to_cpy),
+            "g" (copy_start),
+            "m" (video_memory_segment)
         : "eax", "ecx", "edi", "esi"
     );
 
@@ -48,28 +50,25 @@ void console_scroll(uint32_t lines_count) {
         "mov    %0, %%ecx;"
         "mov    %1, %%edi;"
         "rep    stosb"
-        : : "r" (spaces_to_fill), "r" (spaces_start)
+        : : "r" (spaces_to_fill),
+            "r" (spaces_start)
         : "eax", "ecx", "edi"
     );
 }
 
 void kputc(char symb, uint32_t pos) {
     asm (
-        "mov    %2, %%ax;"
-        "mov    %%ax, %%es;"
-        "movb   %0, %%es:(%1);"
-        "movb   $0x07, %%es:1(%1);"
-        : : "r" (symb), "r" (pos), "r" (video_memory_segment)
-        : "eax"
+        "mov    %2, %%ax;"          // move 2nd arg into ax register (video memory segment)
+        "mov    %3, %%ebx;"         // move 3rd arg into ebx register (control byte)
+        "mov    %%ax, %%es;"        // set the segment register
+        "movb   %0, %%es:(%1);"     // the char to print out  (1st byte)
+        "movb   %%bx, %%es:1(%1);"  // control byte           (2nd byte)
+        : : "r" (symb), 
+            "r" (pos), 
+            "r" (video_memory_segment), 
+            "r" ((uint32_t)color_ctrl)
+        : "eax", "ebx"
     );
-    /*asm (
-        "mov    %2, %%ax;"
-        "mov    %%ax, %%es;"
-        "movb   %0, %%es:(%1);"
-        "movb   $0x07, %%es:1(%1);"
-        : : "r" (color_ctrl), "r" (pos + 1), "r" (video_memory_segment)
-        : "eax"
-    );*/
     set_cursor_offset(pos);
 }
 

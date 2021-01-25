@@ -15,22 +15,6 @@ void init_keyboard() {
     memset(keyboard_buffer, 0, sizeof(keyboard_buffer));
 }
 
-void process_key(uint8_t scan_code) {
-    uint8_t pressed;
-    char symbol = convert_scan_code(scan_code, &pressed);
-    if (pressed && symbol != 0) {
-        kprintf("%c", symbol);
-        
-        // todo fix overflow
-        /* keyboard_buffer[keyboard_buff_pos++] = symbol;
-        if (symbol == '\n') {
-            keyboard_buffer[keyboard_buff_pos - 1] = 0;
-            keyboard_create_recource(keyboard_buffer);
-            keyboard_buff_pos = 0;
-        } */
-    }
-}
-
 unsigned char convert_scan_code(uint8_t scan_code, uint8_t *pressed) {
     int original_scancode = scan_code & 0x7F;
     *pressed = (scan_code & 0x80) ? 1 : 0;
@@ -63,4 +47,20 @@ unsigned char convert_scan_code(uint8_t scan_code, uint8_t *pressed) {
     if (capslock_on)
         return key_map_caps_normal[original_scancode];
     return key_map[original_scancode];
+}
+
+void process_key(uint8_t scan_code) {
+    uint8_t pressed;
+    char symbol = convert_scan_code(scan_code, &pressed);
+    if (pressed && symbol != 0) {
+        kprintf("%c", symbol);
+        
+        // todo fix overflow
+        /* keyboard_buffer[keyboard_buff_pos++] = symbol;
+        if (symbol == '\n') {
+            keyboard_buffer[keyboard_buff_pos - 1] = 0;
+            keyboard_create_recource(keyboard_buffer);
+            keyboard_buff_pos = 0;
+        } */
+    }
 }
