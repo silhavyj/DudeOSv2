@@ -3,6 +3,7 @@
 #include <irq.h>
 #include <support.h>
 #include <paging.h>
+#include <heap.h>
 #include <filesystem.h>
 #include <stdlib/string.h>
 #include <drivers/screen.h>
@@ -16,17 +17,17 @@ extern "C" int _kmain() {
 
     print_os_logo();
 
-    init(&init_gdt,        "initializing GDT...");
-    init(&init_idt,        "initializing IDT...");
-    init(&remap_irq,       "remaping IRQs...");
-    init(&init_timer,      "initializing PIT timer...");
-    init(&init_keyboard,   "initializing keyboard...");
-    init(&init_paging,     "initializing paging...");
-    init(&init_filesystem, "initializing filesystem...");
+    init(&init_gdt,         "initializing GDT...");
+    init(&init_idt,         "initializing IDT...");
+    init(&remap_irq,        "remaping IRQs...");
+    init(&init_timer,       "initializing PIT timer...");
+    init(&init_keyboard,    "initializing keyboard...");
+    init(&init_paging,      "initializing paging...");
+    init(&init_kernel_heap, "initializing kernel heap...");
+    init(&init_filesystem,  "initializing filesystem...");
 
-   // _enable_interrupts();
-
-    list_all_files();
+    void *x = kmalloc(0x80);
+    kprintf("%x\n", x);
 
     while (1)
     {

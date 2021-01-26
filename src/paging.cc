@@ -65,21 +65,17 @@ void init_paging() {
 
 uint32_t frame_alloc() {
     int i, j;
-    uint8_t byte;
     uint32_t frame_number;
 
     for (i = 0; i < FRAMES_COUNT; i++) {
-        if (frames[i] != 0xFF) {    // all frames occupied 
-            byte = frames[i];    // if not there must be at least one free (0)
-            for (j = 0; j < 8; j++) {
-                if ((byte & 1) == 0) {
+         if (frames[i] != 0xFF) {    // all frames occupied 
+            for (j = 0; j < 8; j++)
+                if (((frames[i] >> j) & 1) == 0) {
                     frame_number = i * 8 + j;
                     frame_set_usage(frame_number, 1);
                     return frame_number; 
                 }
-                byte >>= 1;
-            }
-        }
+         }
     }
     panic("all frames are busy!");
     return 0;
