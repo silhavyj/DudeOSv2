@@ -9,9 +9,9 @@ programs     = idle
 header_files = $(programs:=.bin.h)
 bin_files    = $(programs:=.bin)
 
-all: $(header_files)
+all: system_functions.o $(header_files)
 
-%.bin.h: %.bin
+%.bin.h: %.bin 
 	xxd -i $< $@
 
 %.bin: %.o
@@ -19,6 +19,9 @@ all: $(header_files)
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $^ -o $@
+
+%.o: %.asm
+	nasm -f elf $^
 
 .PHONY: clean
 clean:
