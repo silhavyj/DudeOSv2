@@ -11,6 +11,8 @@ extern "C" {
     void _load_idt(uint32_t addr);
     void _enable_interrupts();
     void _disable_interrupts();
+    void _enable_paging();
+    void _disable_paging();
 }
 
 #endif
