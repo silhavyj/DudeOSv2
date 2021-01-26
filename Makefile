@@ -19,12 +19,15 @@ CXX_FLAGS   = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector  \
 			  
 LD_FLAGS    = --Ttext $(KERNEL_START_CODE) -m elf_i386 -s --oformat binary -e $(KERNEL_MAIN)
 
-all: $(OS_IMAGE)
+all: $(OS_IMAGE) user_programs
 
 $(OS_IMAGE) : $(OBJ_FILES)
 	$(LD) $(LD_FLAGS) $(OBJ_FILES) -o $(OS_BIN)
 	make -C boot
 	cat boot/boot.bin $(OS_BIN) /dev/zero | head -c 1474560 > $(OS_IMAGE)
+
+user_programs:
+	make -C include/user-programs
 
 %.o : %.cc
 	$(CXX) $(CXX_FLAGS) -c $^ -o $@
@@ -40,12 +43,13 @@ install-dependencies:
 	sudo apt-get install qemu-system-i386
 
 .PHONY run:
-run: $(OS_IMAGE)
-	qemu-system-i386 $^
+run: $(OS_IMAGE) user_programs
+	qemu-system-i386 $(OS_IMAGE)
 
 .PHONY clean:
 clean:
+	make -C include/user-programs clean
 	make -C boot clean
 	find -name '*.o' | xargs $(RM)
-	rm $(OS_IMAGE)
-	rm $(OS_BIN)
+	$(RM) $(OS_IMAGE)
+	$(RM) $(OS_BIN)
