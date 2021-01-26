@@ -104,3 +104,17 @@ _disable_paging:
     mov     cr0, eax            ; cr0 = eax (update the control register)
     ret                         ; return
 ;---------------------------------------
+
+
+;---------------------------------------
+; loads the page directory into the CPU
+; when enabling paging
+; stack: [esp + 4] page directory addr
+;        [esp    ] return address
+;---------------------------------------
+[global _load_page_dir]
+_load_page_dir:
+    mov     eax, [esp + 4]      ; get the page dir addr from the stack
+    mov     cr3, eax            ; save the page dir into register cr3
+    ret                         ; return
+;---------------------------------------

@@ -32,5 +32,6 @@ void reset_color();
 void set_cursor_offset(uint16_t offset);
 uint16_t get_cursor_offset();
 void print_backspace();
+void panic(const char *debug_info);
 
 #endif

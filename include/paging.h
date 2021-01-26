@@ -20,9 +20,9 @@
 #define KERNEL_SOURCE_SIZE 256          // kernel code size 256 * 4kB = 1MB
 #define KERNEL_STACK_START_ADDR (KERNEL_START_ADDR + KERNEL_SOURCE_SIZE + FRAME_SIZE) // kernel + kernel size + 1KB
 #define KERNEL_STACK_SIZE 4             // kernel stack size 4 * 4kB = 8kB
-#define VIDEO_MEMORY_START (KERNEL_STACK_START_ADDR + KERNEL_STACK_SIZE * FRAME_SIZE + FRAME_SIZE) // kernel stack + kernel stack size + 4kB
-#define KERNEL_HEAP_START_ADDR (VIDEO_MEMORY_START + FRAME_SIZE)
-#define KERNEL_HEAP_SIZE (1024 * 3) // 1024 * 3 frames = 12MB
+#define VIDEO_MEMORY_START_ADDR (KERNEL_STACK_START_ADDR + KERNEL_STACK_SIZE * FRAME_SIZE + FRAME_SIZE) // kernel stack + kernel stack size + 4kB
+#define KERNEL_HEAP_START_ADDR (VIDEO_MEMORY_START_ADDR + FRAME_SIZE)
+#define KERNEL_HEAP_SIZE (1024 * 3)     // 1024 * 3 frames = 12MB
 
 typedef struct {
     uint32_t present    : 1;
@@ -37,13 +37,26 @@ typedef struct {
 } __attribute__((packed)) page_table_entry_t;
 
 typedef struct {
-    page_table_entry_t entries[PAGE_TABLE_COUNT];
+    page_table_entry_t entry[PAGE_TABLE_COUNT];
 } page_table_t;
 
 typedef struct {
-    page_table_entry_t entries[PAGE_TABLE_COUNT];
+    page_table_entry_t entry[PAGE_TABLE_COUNT];
 } page_dir_t;
 
 void init_paging();
+
+uint32_t frame_alloc();
+void frame_free(uint32_t frame_number);
+void frame_set_usage(uint32_t frame_number, uint32_t usage);
+
+uint32_t inline frame_address(uint32_t frame_number);
+uint32_t inline frame_number(uint32_t frame_address);
+uint32_t inline size_in_frames(uint32_t size);
+
+void set_page_table_entry(page_table_entry_t *table_entry, uint32_t frame_addr, uint32_t present, uint32_t rw, uint32_t user_mode);
+void map_page(uint32_t virtual_addr, uint32_t physical_addr);
+void map_page(page_dir_t *page_dir, uint32_t virtual_addr, uint32_t physical_addr);
+void unmap_page(uint32_t virtual_addr);
 
 #endif

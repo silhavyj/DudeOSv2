@@ -13,6 +13,7 @@ extern "C" {
     void _disable_interrupts();
     void _enable_paging();
     void _disable_paging();
+    void _load_page_dir(uint32_t addr);
 }
 
 #endif

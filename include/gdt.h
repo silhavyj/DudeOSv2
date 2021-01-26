@@ -5,10 +5,10 @@
 
 // define individual segments so 
 // we don't have magic number throughout the code
-#define CODE_SEGMENT        0x08
-#define DATA_SEGMENT        0x10
-#define VIDEO_MEMORY        0x18
-#define VIRTUAL_VIDE_MEMORY 0x20 // after paging is enabled
+#define CODE_SEGMENT         0x08
+#define DATA_SEGMENT         0x10
+#define VIDEO_MEMORY         0x18
+#define VIRTUAL_VIDEO_MEMORY 0x20 // after paging is enabled
 
 // these structures need to
 // be packed so the compiler

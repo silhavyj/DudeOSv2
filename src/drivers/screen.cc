@@ -183,3 +183,19 @@ void set_cursor_offset(uint16_t offset) {
 uint16_t get_cursor_offset() {
     return current_cursor_pos;
 }
+
+void panic(const char *debug_info) {
+    set_cursor_offset(0);
+    set_color(BACKGROUND_RED);
+    int i;
+    for (i = 0; i < MAX_COLS * MAX_ROWS; i++)
+        kprintf(" ");
+        
+    set_cursor_offset(0);
+    set_color(BACKGROUND_RED | FOREGROUND_WHITE);
+    kprintf("%s", debug_info);
+
+    while (1) {
+        _halt();
+    }
+}
