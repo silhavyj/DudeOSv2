@@ -5,13 +5,17 @@
 
 #define ALIGN 8
 
-typedef struct heap {
+typedef struct memory_segment {
     uint32_t size;
     uint8_t free;
-    struct heap *next;
-    struct heap *prev;
-    struct heap *next_free;
-    struct heap *prev_free;
+    struct memory_segment *next;
+    struct memory_segment *prev;
+    struct memory_segment *next_free;
+    struct memory_segment *prev_free;
+} memory_segment_t;
+
+typedef struct {
+    memory_segment_t *first_free_seg;
 } heap_t;
 
 void init_kernel_heap();

@@ -23,11 +23,44 @@ extern "C" int _kmain() {
     init(&init_timer,       "initializing PIT timer...");
     init(&init_keyboard,    "initializing keyboard...");
     init(&init_paging,      "initializing paging...");
-   // init(&init_kernel_heap, "initializing kernel heap...");
+    init(&init_kernel_heap, "initializing kernel heap...");
     init(&init_filesystem,  "initializing filesystem...");
 
-   // void *x = kmalloc(0x80);
-   // kprintf("%x\n", x);
+    int *x = (int *)kmalloc(sizeof(int));
+    int *y = (int *)kmalloc(sizeof(int));
+    int *z = (int *)kmalloc(sizeof(int));
+
+    kprintf("%x %x %x\n", x, y,z);
+
+    kfree(z);
+    kfree(y);
+    kfree(x);
+
+    x = (int *)kmalloc(sizeof(int));
+    y = (int *)kmalloc(sizeof(int));
+    z = (int *)kmalloc(sizeof(int));
+
+    kprintf("%x %x %x\n", x, y,z);
+
+    kfree(z);
+    kfree(y);
+    kfree(x);
+
+    x = (int *)kmalloc(sizeof(int));
+    y = (int *)kmalloc(sizeof(int));
+    z = (int *)kmalloc(sizeof(int));
+
+    kprintf("%x %x %x\n", x, y,z);
+
+    kfree(z);
+    kfree(y);
+    kfree(x);
+
+    x = (int *)kmalloc(sizeof(int));
+    y = (int *)kmalloc(sizeof(int));
+    z = (int *)kmalloc(sizeof(int));
+
+    kprintf("%x %x %x\n", x, y,z);
 
     while (1)
     {
