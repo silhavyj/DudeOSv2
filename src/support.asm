@@ -89,13 +89,13 @@ _disable_interrupts:
 [global _enable_paging]
 _enable_paging:
     mov     eax, cr0            ; eax = cr0 (we can't access it directly)
-    or      eax, 0x80000000,    ; set the paging bit; see - https://wiki.osdev.org/Paging#Enabling
+    or      eax, 0x80000000    ; set the paging bit; see - https://wiki.osdev.org/Paging#Enabling
     mov     cr0, eax            ; cr0 = eax (update the control register)
     ret                         ; return
 ;---------------------------------------
 
 ;---------------------------------------
-; enables paging on the CPU
+; disables paging on the CPU
 ;---------------------------------------
 [global _disable_paging]
 _disable_paging:

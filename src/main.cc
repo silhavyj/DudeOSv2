@@ -21,7 +21,7 @@ extern "C" int _kmain() {
     init(&remap_irq,       "remaping IRQs...");
     init(&init_timer,      "initializing PIT timer...");
     init(&init_keyboard,   "initializing keyboard...");
-    init(&init_paging,   "initializing paging...");
+    init(&init_paging,     "initializing paging...");
     init(&init_filesystem, "initializing filesystem...");
 
    // _enable_interrupts();

@@ -10,7 +10,7 @@ const file_t files[] {
 uint32_t files_count = 0;
 
 const file_t *get_file(const char *filename) {
-    int i;
+    uint32_t i;
     for (i = 0; i < files_count; i++)
         if (strcmp(filename, files[i].name) == 0)
             return &files[i];
@@ -18,7 +18,7 @@ const file_t *get_file(const char *filename) {
 }
 
 void list_all_files() {
-    int i;
+    uint32_t i;
     for (i = 0; i < files_count; i++)
         kprintf("%s [%d B]\n", files[i].name, files[i].size);
 }
