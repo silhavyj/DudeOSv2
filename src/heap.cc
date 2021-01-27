@@ -4,122 +4,89 @@
 
 heap_t kernel_heap;
 
-static void merge(memory_segment_t *a, memory_segment_t *b);
-
 void init_heap(heap_t *heap, uint32_t base_addr, uint32_t size_in_frames) {
-    heap->first_free_seg = (memory_segment_t *)base_addr;
-    heap->first_free_seg->size = size_in_frames * FRAME_SIZE - sizeof(memory_segment_t);
-    heap->first_free_seg->free = 1;
-    heap->first_free_seg->next = NULL;
-    heap->first_free_seg->prev = NULL;
-    heap->first_free_seg->next_free = NULL;
-    heap->first_free_seg->prev_free = NULL;
+    heap->base_addr = base_addr;
+    heap->free_mem_addr = heap->base_addr;
+    heap->size = size_in_frames * FRAME_SIZE;
+    heap->head = NULL;
+    heap->tail = NULL;
 }
 
-void heap_free(heap_t *heap, void *addr) {
-    memory_segment_t *curr_mem_seg = (memory_segment_t *)addr - 1;
-    curr_mem_seg->free = 1;
+void heap_insert_element(heap_t *heap, heap_element_t *element) {
+    if (heap->head == NULL) {
+        element->next = NULL;
+        element->prev = NULL;
+        heap->head = element;
+        heap->tail = element;
+    } else {
+        element->prev = heap->tail;
+        heap->tail->next = element;
+        heap->tail = element;
+    }
+}
 
-    if (curr_mem_seg < heap->first_free_seg)
-        heap->first_free_seg = curr_mem_seg;
-
-    if (curr_mem_seg->next_free != NULL) {
-        if (curr_mem_seg->next_free->prev_free < curr_mem_seg)
-            curr_mem_seg->next_free->prev_free = curr_mem_seg;
-    }
-    if (curr_mem_seg->prev_free != NULL) {
-        if (curr_mem_seg->prev_free->next_free > curr_mem_seg) {
-            curr_mem_seg->prev_free->next_free = curr_mem_seg;
-        }
-    }
-    if (curr_mem_seg->next != NULL) {
-        curr_mem_seg->next->prev = curr_mem_seg;
-        if (curr_mem_seg->next->free)
-            merge(curr_mem_seg, curr_mem_seg->next);
-    }
-    if (curr_mem_seg->prev != NULL) {
-        curr_mem_seg->prev->next = curr_mem_seg;
-        if (curr_mem_seg->prev->free)
-            merge(curr_mem_seg, curr_mem_seg->prev);
+void heap_remove_element(heap_t *heap) {
+    if (heap->tail == heap->head) {
+        heap->tail = NULL;
+        heap->head = NULL;
+    } else {
+        heap->tail = heap->tail->prev;
+        heap->tail->next = NULL;
     }
 }
 
 void *heap_malloc(heap_t *heap, uint32_t size) {
-    memory_segment_t *curr_mem_seg = heap->first_free_seg; 
-    
-    while (1) {
-        if (curr_mem_seg->size >= size) {
-            if (curr_mem_seg->size > size + sizeof(memory_segment_t)) {
-                memory_segment_t *new_mem_seg = (memory_segment_t *)((uint32_t)curr_mem_seg + sizeof(memory_segment_t) + size);
-                new_mem_seg->size = (uint32_t)curr_mem_seg->size - sizeof(memory_segment_t) - size;
+    uint32_t physical_size;
+    heap_element_t *element;
 
-                new_mem_seg->next_free = curr_mem_seg->next_free;
-                new_mem_seg->prev_free = curr_mem_seg->prev_free;
+    physical_size = size + sizeof(heap_element_t);
+    if (heap->free_mem_addr + physical_size <= heap->base_addr + heap->size) {
+        element = (heap_element_t *)heap->free_mem_addr;
+        element->free = 0;
+        element->data_size = size;
+        element->data = (void *)((uint32_t)element + sizeof(heap_element_t));
 
-                new_mem_seg->next = curr_mem_seg->next;
-                new_mem_seg->prev = curr_mem_seg;
-                new_mem_seg->free = 1;
-                curr_mem_seg->size = size;
-
-                curr_mem_seg->next_free = new_mem_seg;
-                curr_mem_seg->next = new_mem_seg;
+        heap_insert_element(heap, element);
+        heap->free_mem_addr += physical_size;
+        return element->data;
+    } else {
+        element = heap->head;
+        while (element != NULL) {
+            if (element->free == 1 && element->next != NULL && element->free == 1) {
+                element->data_size += element->next->data_size;
+                element->next = element->next->next;
             }
-            if (curr_mem_seg == heap->first_free_seg)
-                heap->first_free_seg = curr_mem_seg->next_free;
-
-            if (curr_mem_seg->prev_free != NULL)
-                curr_mem_seg->prev_free->next_free = curr_mem_seg->next_free;
-
-            if (curr_mem_seg->next_free != NULL)
-                curr_mem_seg->next_free->prev_free = curr_mem_seg->prev_free;
-
-            if (curr_mem_seg->prev != NULL)
-                curr_mem_seg->prev->next_free = curr_mem_seg->next_free;
-
-            if (curr_mem_seg->next != NULL)
-                curr_mem_seg->next->prev_free = curr_mem_seg->prev_free;
-
-            curr_mem_seg->free = 0;
-            return curr_mem_seg + 1;
+            if (element->free == 1 && element->data_size >= size) {
+                element->free = 0;
+                return element->data;
+            }
+            element = element->next;
         }
-        if (curr_mem_seg->next_free == NULL)
-            break; // ran out of memory
-
-        curr_mem_seg = curr_mem_seg->next_free;
     }
     return NULL;
 }
 
-static void merge(memory_segment_t *a, memory_segment_t *b) {
-    if (a == NULL || b == NULL)
+void heap_free(heap_t *heap, void *addr) {
+    if ((uint32_t)addr < heap->base_addr || (uint32_t)addr > (heap->base_addr + heap->size * FRAME_SIZE))
         return;
-
-    if (a < b) {
-        memory_segment_t *c = a;
-        a = b;
-        b = c;
+    
+    heap_element_t *element = (heap_element_t *)((uint32_t)addr - sizeof(heap_element_t));
+    if (element == heap->tail) {
+        heap_remove_element(heap);
+        heap->free_mem_addr = (uint32_t)element;
     }
-
-    a->size += b->size + sizeof(memory_segment_t);
-    a->next = b->next;
-    a->next_free = b->next_free;
-
-    b->next->prev = a;
-    b->next->prev_free = a;
-    b->next_free->prev_free = a;
-}
-
-void *kmalloc(uint32_t size) {
-    void *data = heap_malloc(&kernel_heap, size);
-    if (data == NULL)
-        panic("Kernel ran out of heap memory!");
-    return data;
-}
-
-void kfree(void *addr) {
-    heap_free(&kernel_heap, addr);
+    else 
+        element->free = 1;
 }
 
 void init_kernel_heap() {
     init_heap(&kernel_heap, KERNEL_HEAP_START_ADDR, KERNEL_HEAP_SIZE);
+}
+
+void *kmalloc(uint32_t size) {
+    return heap_malloc(&kernel_heap, size);
+}
+
+void kfree(void *addr) {
+    heap_free(&kernel_heap, addr);
 }

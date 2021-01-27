@@ -104,7 +104,7 @@ uint32_t inline frame_number(uint32_t frame_address) {
     return (FRAMES_START_ADDR - frame_address) / FRAME_SIZE;
 }
 
-uint32_t inline size_in_frames(uint32_t size) {
+uint32_t size_in_frames(uint32_t size) {
     uint32_t frame_count = size / FRAME_SIZE;
     if (size % FRAME_SIZE != 0)
         frame_count++;

@@ -52,7 +52,7 @@ void frame_set_usage(uint32_t frame_number, uint32_t usage);
 
 uint32_t inline frame_address(uint32_t frame_number);
 uint32_t inline frame_number(uint32_t frame_address);
-uint32_t inline size_in_frames(uint32_t size);
+uint32_t size_in_frames(uint32_t size);
 
 void set_page_table_entry(page_table_entry_t *table_entry, uint32_t frame_addr, uint32_t present, uint32_t rw, uint32_t user_mode);
 void map_page(uint32_t virtual_addr, uint32_t physical_addr);

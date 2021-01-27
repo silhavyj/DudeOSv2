@@ -3,23 +3,29 @@
 
 #include <stdlib/stdint.h>
 
-typedef struct memory_segment {
-    uint32_t size;
+typedef struct heap_element {
     uint8_t free;
-    struct memory_segment *next;
-    struct memory_segment *prev;
-    struct memory_segment *next_free;
-    struct memory_segment *prev_free;
-} memory_segment_t;
+    struct heap_element *next;
+    struct heap_element *prev;
+    uint32_t data_size;
+    void *data;
+} heap_element_t;
 
 typedef struct {
-    memory_segment_t *first_free_seg;
+    uint32_t base_addr;
+    uint32_t free_mem_addr;
+    uint32_t size;
+    heap_element_t *head;
+    heap_element_t *tail;
 } heap_t;
 
-void init_kernel_heap();
 void init_heap(heap_t *heap, uint32_t base_addr, uint32_t size_in_frames);
-void heap_free(heap_t *heap, void *addr);
+void heap_insert_element(heap_t *heap, heap_element_t *element);
+void heap_remove_element(heap_t *heap);
 void *heap_malloc(heap_t *heap, uint32_t size);
+void heap_free(heap_t *heap, void *addr);
+
+void init_kernel_heap();
 void *kmalloc(uint32_t size);
 void kfree(void *addr);
 
