@@ -45,11 +45,6 @@ void heap_free(heap_t *heap, void *addr) {
 }
 
 void *heap_malloc(heap_t *heap, uint32_t size) {
-    uint32_t remainder = size % ALIGN;
-    size -= remainder;
-    if (remainder != 0)
-        size += ALIGN;
-
     memory_segment_t *curr_mem_seg = heap->first_free_seg; 
     
     while (1) {

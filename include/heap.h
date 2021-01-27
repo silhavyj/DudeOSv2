@@ -3,8 +3,6 @@
 
 #include <stdlib/stdint.h>
 
-#define ALIGN 8
-
 typedef struct memory_segment {
     uint32_t size;
     uint8_t free;

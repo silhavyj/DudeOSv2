@@ -8,6 +8,7 @@
 #include <stdlib/string.h>
 #include <drivers/screen.h>
 #include <drivers/keyboard.h>
+#include <stdlib/list.h>
 
 void print_os_logo();
 void init(void (*init_fce)(), const char *msg);
@@ -25,42 +26,6 @@ extern "C" int _kmain() {
     init(&init_paging,      "initializing paging...");
     init(&init_kernel_heap, "initializing kernel heap...");
     init(&init_filesystem,  "initializing filesystem...");
-
-    int *x = (int *)kmalloc(sizeof(int));
-    int *y = (int *)kmalloc(sizeof(int));
-    int *z = (int *)kmalloc(sizeof(int));
-
-    kprintf("%x %x %x\n", x, y,z);
-
-    kfree(z);
-    kfree(y);
-    kfree(x);
-
-    x = (int *)kmalloc(sizeof(int));
-    y = (int *)kmalloc(sizeof(int));
-    z = (int *)kmalloc(sizeof(int));
-
-    kprintf("%x %x %x\n", x, y,z);
-
-    kfree(z);
-    kfree(y);
-    kfree(x);
-
-    x = (int *)kmalloc(sizeof(int));
-    y = (int *)kmalloc(sizeof(int));
-    z = (int *)kmalloc(sizeof(int));
-
-    kprintf("%x %x %x\n", x, y,z);
-
-    kfree(z);
-    kfree(y);
-    kfree(x);
-
-    x = (int *)kmalloc(sizeof(int));
-    y = (int *)kmalloc(sizeof(int));
-    z = (int *)kmalloc(sizeof(int));
-
-    kprintf("%x %x %x\n", x, y,z);
 
     while (1)
     {
