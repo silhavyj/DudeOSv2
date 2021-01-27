@@ -2,6 +2,8 @@
 #include <irq.h>
 #include <gdt.h>
 #include <support.h>
+#include <process.h>
+#include <syscalls.h>
 #include <drivers/screen.h>
 #include <drivers/keyboard.h>
 
@@ -62,6 +64,11 @@ void idt_set_entry(uint8_t index, uint32_t isr_addr, uint16_t segment, uint8_t p
 
 // system calls handler
 void _int0x80_handler(int_registers_t regs) {
+    asm("mov %0, %%esp" : : "r" (get_kernel_ESP()));
+    PCB_t *running_process = get_running_process();
+    process_save_context(running_process, &regs);
+    handle_systemcall(&regs);
+    switch_process();
 }
 
 // PIT (system timer) handler
@@ -78,6 +85,13 @@ void _int0x21_handler(int_registers_t regs) {
 
  // double fault
 void _int0x8_handler() {
+    PCB_t *pcb = get_running_process();
+    asm ("mov %0, %%esp" : : "r" (get_kernel_ESP()));
+    set_color(FOREGROUND_LIGHTRED);
+    kprintf("#---ERROR--- Double fault : %s pid=0x%x\n", pcb->name, pcb->pid);
+    reset_color();
+    kill_process(pcb);
+    switch_process();
 }   
 
 // segment not present
@@ -86,14 +100,35 @@ void _int0xB_handler(int_with_err_registers_t regs) {
 
 // stack fault
 void _int0xC_handler() {
+    PCB_t *pcb = get_running_process();
+    asm ("mov %0, %%esp" : : "r" (get_kernel_ESP()));
+    set_color(FOREGROUND_LIGHTRED);
+    kprintf("#---ERROR--- Stack fault : %s pid=0x%x\n", pcb->name, pcb->pid);
+    reset_color();
+    kill_process(pcb);
+    switch_process();
 }   
 
 // general protection fault
 void _int0xD_handler() {
+    PCB_t *pcb = get_running_process();
+    asm ("mov %0, %%esp" : : "r" (get_kernel_ESP()));
+    set_color(FOREGROUND_LIGHTRED);
+    kprintf("#---ERROR--- General protection fault : %s pid=0x%x\n", pcb->name, pcb->pid);
+    reset_color();
+    kill_process(pcb);
+    switch_process();
 }                     
 
 // page fault
 void _int0xE_handler(uint32_t faulting_addr) {
+    PCB_t *pcb = get_running_process();
+    asm ("mov %0, %%esp" : : "r" (get_kernel_ESP()));
+    set_color(FOREGROUND_LIGHTRED);
+    kprintf("#---ERROR--- Page fault %x: %s pid=0x%x\n", faulting_addr, pcb->name, pcb->pid);
+    reset_color();
+    kill_process(pcb);
+    switch_process();
 }   
 
 // unknown interrupt

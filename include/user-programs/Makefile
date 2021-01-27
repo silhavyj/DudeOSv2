@@ -5,11 +5,11 @@ CXXFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 LD       = ld
 LDFLAGS  = --Ttext 0x0 --oformat binary -m elf_i386
 
-programs     = idle
+programs     = idle shell error
 header_files = $(programs:=.bin.h)
 bin_files    = $(programs:=.bin)
 
-all: system_functions.o $(header_files)
+all: $(header_files)
 
 %.bin.h: %.bin 
 	xxd -i $< $@

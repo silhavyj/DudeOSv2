@@ -27,7 +27,7 @@ void print_pcb(void *addr) {
     set_color(FOREGROUND_LIGHTGRAY);
     kprintf("name=");
     reset_color();
-    kprintf("%s ", pcb->process_name);
+    kprintf("%s ", pcb->name);
 
     set_color(FOREGROUND_LIGHTGRAY);
     kprintf("state=");
@@ -61,6 +61,8 @@ void init_process_scheduler() {
     ready_processes            = list_create(); // create queue of ready processes
     waiting_processes          = list_create(); // create queue of waiting processes
     waiting_keyboard_processes = list_create(); // create stack of processes waiting for keyboard
+    
+    idle_process = create_process("idle.exe");  // load the idle process
 }
 
 uint32_t load_process(uint32_t *pages, const char *process_name) {
@@ -104,6 +106,23 @@ uint32_t load_process(uint32_t *pages, const char *process_name) {
     return page_count;
 }
 
+void switch_process() {
+    running_process = idle_process;
+    while (ready_processes->first != NULL && running_process == idle_process) {
+        running_process = (PCB_t *)ready_processes->first->data;
+        list_remove(ready_processes, 0, NULL);
+    }
+    set_color(FOREGROUND_DARKGRAY);
+    kprintf("scheduled: pid=%x name=%s\n", running_process->pid, running_process->name);
+    reset_color();
+    process_load_context(running_process);
+}
+
+void set_process_as_ready(PCB_t *pcb) {
+    pcb->state = PROCESS_STATE_READY;
+    list_add_last(ready_processes, pcb);
+}
+
 PCB_t *create_process(const char *process_name) {
     int i;
     int program_page_count = 0;
@@ -111,25 +130,25 @@ PCB_t *create_process(const char *process_name) {
     // we don't need to test againts NULL as the kernel would go into panic mode anyway
     PCB_t *pcb = (PCB_t *)kmalloc(sizeof(PCB_t)); 
 
-    strcpy(pcb->process_name, process_name);
+    strcpy(pcb->name, process_name);
     pcb->state = PROCESS_STATE_NEW;
     pcb->pid = (uint32_t)pcb; 
 
     // initialize process pages
     for (i = 0; i < PROCESS_MAX_MEMORY_PAGES; i++)
-        pcb->mem_pages[i] = PROCESS_UNUSED_PAGE;
+        pcb->pages[i] = PROCESS_UNUSED_PAGE;
 
-    program_page_count = load_process(pcb->mem_pages, pcb->process_name);
+    program_page_count = load_process(pcb->pages, pcb->name);
     if (program_page_count == 0)
         return 0;   // something went wrong
 
     // initialize process stack (2 FRAMES = 2 * 4kB = 8kB)
-    pcb->mem_pages[PROCESS_MAX_MEMORY_PAGES - 2] = frame_address(frame_alloc());
+    pcb->pages[PROCESS_MAX_MEMORY_PAGES - 2] = frame_address(frame_alloc());
 
     // initialize process heap
     // [CODE][HEAP][STACK]
     for (i = program_page_count; i < PROCESS_MAX_MEMORY_PAGES - 3; i++)
-        pcb->mem_pages[i] = frame_address(frame_alloc());
+        pcb->pages[i] = frame_address(frame_alloc());
 
     init_heap(&pcb->heap, program_page_count * FRAME_SIZE, i - program_page_count);
 
@@ -156,16 +175,102 @@ PCB_t *create_process(const char *process_name) {
     return pcb;
 }
 
-void process_save_context(PCB_t *pid, int_registers_t *regs) {
-    pid->registers.EAX = regs->eax;
-    pid->registers.EBX = regs->ebx;
-    pid->registers.ECX = regs->ecx;
-    pid->registers.EDX = regs->edx;
-    pid->registers.ESI = regs->esi;
-    pid->registers.EDI = regs->edi;
-    pid->registers.ESP = regs->esp + 12;
-    pid->registers.EBP = regs->ebp;
-    pid->registers.E_FLAGS = regs->eflags;
-    pid->registers.EIP = regs->eip;
-    pid->registers.CS = regs->cs;
+void process_save_context(PCB_t *pcb, int_registers_t *regs) {
+    pcb->registers.EAX = regs->eax;
+    pcb->registers.EBX = regs->ebx;
+    pcb->registers.ECX = regs->ecx;
+    pcb->registers.EDX = regs->edx;
+    pcb->registers.ESI = regs->esi;
+    pcb->registers.EDI = regs->edi;
+    pcb->registers.ESP = regs->esp + 12;
+    pcb->registers.EBP = regs->ebp;
+    pcb->registers.E_FLAGS = regs->eflags;
+    pcb->registers.EIP = regs->eip;
+    pcb->registers.CS = regs->cs;
+}
+
+void process_load_context(PCB_t *pcb) {
+    int i;
+    pcb->state = PROCESS_STATE_RUNNING;
+
+    // memory switch
+    for (i = 0; i < PROCESS_MAX_MEMORY_PAGES; i++)
+        if (pcb->pages[i] != PROCESS_UNUSED_PAGE) {
+            unmap_page(i * FRAME_SIZE);
+            map_page(i * FRAME_SIZE, pcb->pages[i]);
+        }
+
+    pages_refresh();
+
+    kernel_ESP = 0x6504FE0;
+
+    asm (
+        "push %0;"
+        "pop %%esp;"
+        "push %1;"
+        "push %2;"
+        "push %3;"
+        : : "g" (pcb->registers.ESP), "g" (pcb->registers.E_FLAGS), "g" (pcb->registers.CS),
+            "g" (pcb->registers.EIP)
+    );
+    asm(
+        "push %0;"
+        "push %1;"
+        "push %2;"
+        "push %3;"
+        : :  "g" (pcb->registers.DS), "g" (pcb->registers.ES), "g" (pcb->registers.FS),
+             "g" (pcb->registers.GS)
+    );
+    asm
+    (
+        "push %0;"
+        "push %1;"
+        "push %2;"
+        "push %3;"
+        "push %4;"
+        "push %5;"
+        "push %6;"
+        "push %7;"
+        : : "g" (pcb->registers.EAX), "g" (pcb->registers.ECX), "g" (pcb->registers.EDX),
+            "g" (pcb->registers.EBX), "g" (pcb->registers.ESP), "g" (pcb->registers.EBP),
+            "g" (pcb->registers.ESI), "g" (pcb->registers.EDI)
+    );
+    asm
+    (
+        "popa;"
+        "pop %%gs;"
+        "pop %%fs;"
+        "pop %%es;"
+        "pop %%ds;"
+        "iret;"
+        : :
+    );
+}
+
+void kill_process(PCB_t *pcb) {
+    int i;
+
+    // free all pages used by the process
+    for (i = 0; i < PROCESS_MAX_MEMORY_PAGES; i++)
+        if (pcb->pages[i] != PROCESS_UNUSED_PAGE) {
+            frame_free(frame_number(pcb->pages[i]));
+            unmap_page(pcb->pages[i]);
+        }
+
+    // remove pcb from queues and stack
+    list_remove_data(all_processes, (void *)pcb->pid, NULL);
+    list_remove_data(ready_processes, (void *)pcb->pid, NULL);
+    list_remove_data(waiting_processes, (void *)pcb->pid, NULL);
+    list_remove_data(waiting_keyboard_processes, (void *)pcb->pid, NULL);
+
+    // clean memory
+    kfree(pcb);
+}
+
+PCB_t *get_running_process() {
+    return running_process;
+}
+
+uint32_t get_kernel_ESP() {
+    return kernel_ESP;
 }

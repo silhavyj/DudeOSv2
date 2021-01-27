@@ -105,7 +105,6 @@ _disable_paging:
     ret                         ; return
 ;---------------------------------------
 
-
 ;---------------------------------------
 ; loads the page directory into the CPU
 ; when enabling paging

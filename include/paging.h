@@ -58,5 +58,6 @@ void set_page_table_entry(page_table_entry_t *table_entry, uint32_t frame_addr, 
 void map_page(uint32_t virtual_addr, uint32_t physical_addr);
 void map_page(page_dir_t *page_dir, uint32_t virtual_addr, uint32_t physical_addr);
 void unmap_page(uint32_t virtual_addr);
+void pages_refresh();
 
 #endif

@@ -145,3 +145,7 @@ void unmap_page(uint32_t virtual_addr) {
 
     set_page_table_entry(&page_table->entry[page_number], 0, 0, 0, 0);
 }
+
+void pages_refresh() {
+    _load_page_dir((uint32_t)page_dir);
+}

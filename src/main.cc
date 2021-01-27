@@ -31,8 +31,11 @@ extern "C" int _kmain() {
 
     kprintf("\n");
 
-    PCB_t *shell = create_process("idle.exe");
-    print_all_processes();
+    set_process_as_ready(create_process("error.exe"));
+
+    PCB_t *shell = create_process("shell.exe");
+    set_process_as_ready(shell);
+    switch_process();
 
     while (1)
     {

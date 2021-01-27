@@ -24,16 +24,22 @@ typedef struct {
 typedef struct {
     uint32_t pid;
     uint8_t state;
-    char process_name[PROCESS_NAME_LEN];
+    char name[PROCESS_NAME_LEN];
     regs_t registers;
-    uint32_t mem_pages[PROCESS_MAX_MEMORY_PAGES];
+    uint32_t pages[PROCESS_MAX_MEMORY_PAGES];
     heap_t heap;
 } PCB_t;
 
 void init_process_scheduler();
 uint32_t load_process(uint32_t *pages, const char *process_name);
 PCB_t *create_process(const char *process_name);
-void process_save_context(PCB_t *pid, int_registers_t *regs);
+void process_save_context(PCB_t *pcb, int_registers_t *regs);
 void print_all_processes();
+void process_load_context(PCB_t *pcb);
+void switch_process();
+void set_process_as_ready(PCB_t *pcb);
+void kill_process(PCB_t *pcb);
+PCB_t *get_running_process();
+uint32_t get_kernel_ESP();
 
 #endif
