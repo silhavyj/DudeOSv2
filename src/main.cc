@@ -29,8 +29,10 @@ extern "C" int _kmain() {
     init(&init_process_scheduler, "initializing process scheduler...");
     init(NULL,                    "starting shell...");
 
+    kprintf("\n");
+
     PCB_t *shell = create_process("idle.exe");
-    kprintf("%x\n", shell);
+    print_all_processes();
 
     while (1)
     {

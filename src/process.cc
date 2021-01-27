@@ -16,6 +16,46 @@ uint32_t kernel_ESP = 0x6504FE0;    // kernel stack pointer
 PCB_t *running_process; // currently running task
 PCB_t *idle_process;    // can't be removed! (active when there's no ready process)
 
+void print_pcb(void *addr) {
+    PCB_t *pcb = (PCB_t *)addr;
+
+    set_color(FOREGROUND_LIGHTGRAY);
+    kprintf("PID=");
+    reset_color();
+    kprintf("%x ", (uint32_t)pcb);
+
+    set_color(FOREGROUND_LIGHTGRAY);
+    kprintf("name=");
+    reset_color();
+    kprintf("%s ", pcb->process_name);
+
+    set_color(FOREGROUND_LIGHTGRAY);
+    kprintf("state=");
+    reset_color();
+    switch(pcb->state) {
+        case PROCESS_STATE_NEW:
+            kprintf("NEW");
+            break;
+        case PROCESS_STATE_RUNNING:
+            kprintf("RUNNING");
+            break;
+        case PROCESS_STATE_WAITING:
+            kprintf("WAITING");
+            break;
+        case PROCESS_STATE_READY:
+            kprintf("READY");
+            break;
+        default:
+            kprintf("?");
+            break;
+    }
+    kprintf("\n");
+}
+
+void print_all_processes() {
+    list_print(all_processes, &print_pcb);
+}
+
 void init_process_scheduler() {
     all_processes              = list_create(); // create queue of all processes
     ready_processes            = list_create(); // create queue of ready processes
@@ -72,6 +112,7 @@ PCB_t *create_process(const char *process_name) {
     PCB_t *pcb = (PCB_t *)kmalloc(sizeof(PCB_t)); 
 
     strcpy(pcb->process_name, process_name);
+    pcb->state = PROCESS_STATE_NEW;
     pcb->pid = (uint32_t)pcb; 
 
     // initialize process pages
