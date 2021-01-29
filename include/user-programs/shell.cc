@@ -1,10 +1,9 @@
+#include "system.h"
+
 int start() {
-    //while (1);
-    asm(
-        "mov %0, %%eax;"
-        "int $0x80;"
-        : : "r" (100)
-        : "eax"
-    );
+    void *mem = _umalloc(1024);
+    _ufree(mem);
+
+    _uexit();
     return 0;
 }

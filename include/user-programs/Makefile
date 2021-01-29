@@ -13,8 +13,8 @@ all: $(header_files)
 
 %.bin.h: %.bin 
 	xxd -i $< $@
-
-%.bin: %.o
+ 
+%.bin: %.o system.o
 	$(LD) $(LDFLAGS) $^ -o $@
 
 %.o: %.cc
@@ -25,4 +25,4 @@ all: $(header_files)
 
 .PHONY: clean
 clean:
-	$(RM) $(header_files) $(bin_files)
+	$(RM) $(header_files) $(bin_files) *.o
