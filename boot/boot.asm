@@ -11,7 +11,6 @@ KERNAL_STACK_PTR     dd  0x6504FFF      ; kernel stack pointer
 KERNEL_SOURCE_CODE   dd  0x7E00         ; kernel source code start
 ;----------------------------------------------
 WELCOME_MSG:         db "Welcome to DudeOSv2 bootloader", 0
-STARTING_KERNEL_MSG: db "Starting kernel...", 0
 ;----------------------------------------------
 %include "print.asm"                    ; include module for printing
 %include "A20.asm"                      ; include module for enabling A20
