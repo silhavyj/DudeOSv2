@@ -1,6 +1,6 @@
 #include "system.h"
 
-int start() {
+int main() {
    // void *mem = _umalloc(1024);
    // _ufree(mem);
 
@@ -11,5 +11,4 @@ int start() {
     }
 
     _uexit();
-    return 0;
 }
