@@ -5,6 +5,7 @@ extern "C" {
     void _uexit();
     void *_umalloc(unsigned int size);
     void _ufree(void *addr);
+    unsigned int _uexec(const char *program);
 }
 
 #endif

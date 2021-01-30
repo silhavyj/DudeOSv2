@@ -17,3 +17,10 @@ _ufree:
     mov     eax, 104
     int     0x80
     ret
+
+[global _uexec]
+_uexec:
+    mov     ebx, [esp + 4]
+    mov     eax, 105
+    int     0x80
+    ret

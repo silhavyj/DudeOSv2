@@ -1,6 +1,7 @@
+#include "system.h"
+
 int main() {
     char *p = (char *)0xFFFFFFF;
     *p = 'A';
-    // todo add uexit();
-    while (1);
+    _uexit();
 }

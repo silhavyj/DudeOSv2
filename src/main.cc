@@ -31,8 +31,6 @@ extern "C" int _kmain() {
 
     kprintf("\n");
 
-    set_process_as_ready(create_process("error.exe"));
-
     PCB_t *shell = create_process("shell.exe");
     set_process_as_ready(shell);
     switch_process();
