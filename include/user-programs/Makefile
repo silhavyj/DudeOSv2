@@ -14,7 +14,7 @@ all: $(header_files)
 %.bin.h: %.bin 
 	xxd -i $< $@
  
-%.bin: %.o system.o
+%.bin: %.o system.o system_calls.o
 	$(LD) $(LDFLAGS) $^ -o $@
 
 %.o: %.cc

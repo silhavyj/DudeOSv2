@@ -4,6 +4,7 @@
 #include <drivers/colors.h>
 #include <stdlib/stdint.h>
 
+#define SCREEN_BUFFER_SIZE 128
 #define MAX_ROWS 25
 #define MAX_COLS 80
 #define BYTES_PER_SYMBOL 2

@@ -5,6 +5,18 @@
 
 static int int_to_ascii_pos(int x, char str[], int pos);
 
+int append(char *str1, const char *str2) {
+    uint32_t len1 = strlen(str1);
+    uint32_t len2 = strlen(str2);
+    uint32_t i;
+
+    for (i = 0; i < len2; i++)
+        str1[i + len1] = str2[i];
+    
+    str1[len1 + len2] = '\0';
+    return len1 + len2;
+}
+
 uint32_t strlen(const char *str) {
     uint32_t i = 0;
     while (str[i] != 0)
@@ -167,5 +179,56 @@ void double_to_ascii(double num, char *str, uint8_t afterpoint) {
         append(str, '.');
         float_part = float_part * pow(10, afterpoint); 
         int_to_ascii_pos((uint32_t)float_part, str, i + 1); 
+    }
+}
+
+void va_stringf(char *str, const char* format, va_list valist) {
+    uint32_t i;
+    char buffer[128];
+    double d_value;
+    int value;
+
+    uint32_t len = strlen(format);
+
+     for (i = 0; i < len; i++) {
+        if (format[i] == '%') {
+            if (i < len - 1) {
+                if (format[i+1] != '%') {
+                    memset(buffer, '\0', 32);
+                    switch (format[i+1]) {
+                        case 'd':
+                            value = va_arg(valist, int32_t);
+                            int_to_str(buffer, value, 10);
+                            break;
+                        case 's':
+                            strcpy(buffer, va_arg(valist, char *));
+                            break;
+                        case 'c':
+                            buffer[0] = va_arg(valist, int);
+                            buffer[1] = '\0';
+                            break;
+                        case 'x':
+                            value = va_arg(valist, int32_t);
+                            int_to_str(buffer, value, 16);
+                            break;
+                        case 'f':
+                            d_value = va_arg(valist, double);
+                            double_to_ascii(d_value, buffer, 3);
+                            break;
+                        default:
+                            // TODO fix this
+                            break;
+                    }
+                    append(str, buffer);
+                    i++;
+                    continue;
+                } else {
+                    i++;
+                }
+            }
+        }
+        buffer[0] = format[i];
+        buffer[1] = '\0';
+        append(str, buffer);
     }
 }

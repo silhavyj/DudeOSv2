@@ -7,6 +7,7 @@
 uint8_t color_ctrl;
 uint32_t current_cursor_pos;
 uint16_t video_memory_segment = 0x18;
+char screen_buffer[SCREEN_BUFFER_SIZE];
 
 void set_color(uint8_t val) {
     color_ctrl = val;
@@ -77,13 +78,9 @@ void print_backspace() {
 }
 
 void kprintf(const char *str, ...) {
-uint32_t i;
+    uint32_t i;
     uint32_t args_count = 0;
     va_list valist;
-    char buffer[128];
-    int value;
-    double d_value;
-
     uint32_t len = strlen(str);
 
     for (i = 0; i < len; i++)
@@ -93,52 +90,9 @@ uint32_t i;
         }
 
     va_start(valist, args_count);
-    for (i = 0; i < len; i++) {
-        if (str[i] == '%') {
-            if (i < len - 1) {
-                if (str[i+1] != '%') {
-                    memset(buffer, '\0', 32);
-                    switch (str[i+1]) {
-                        case 'd':
-                            value = va_arg(valist, int32_t);
-                            int_to_str(buffer, value, 10);
-                            kputs(buffer);
-                            break;
-                        case 's':
-                            kputs(va_arg(valist, char *));
-                            break;
-                        case 'c':
-                            buffer[0] = va_arg(valist, int);
-                            buffer[1] = '\0';
-                            kputs(buffer);
-                            break;
-                        case 'x':
-                            value = va_arg(valist, int32_t);
-                            int_to_str(buffer, value, 16);
-                            kputs(buffer);
-                            break;
-                        case 'f':
-                            d_value = va_arg(valist, double);
-                            double_to_ascii(d_value, buffer, 3);
-                            kputs(buffer);
-                            break;
-                        default:
-                            set_color(ERROR_COLOR);
-                            kputs("ERROR\n");
-                            reset_color();
-                            return;
-                    }
-                    i++;
-                    continue;
-                } else {
-                    i++;
-                }
-            }
-        }
-        buffer[0] = str[i];
-        buffer[1] = '\0';
-        kputs(buffer);
-    }
+    memset(screen_buffer, '\0', SCREEN_BUFFER_SIZE);
+    va_stringf(screen_buffer, str, valist);
+    kputs(screen_buffer);
 }
 
 void kputs(const char *str) {

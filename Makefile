@@ -4,7 +4,7 @@ CXX_ALL_SRC_FILES = src/main.cc $(CXX_SRC_FILES)
 ASM_SRC_FILES     = $(shell find src -name *.asm)
 
 OBJ_FILES	  = $(CXX_ALL_SRC_FILES:.cc=.o) \
-			    $(ASM_SRC_FILES:.asm=.o)
+				$(ASM_SRC_FILES:.asm=.o)
 
 KERNEL_MAIN       = _kmain
 OS_IMAGE          = dudeosv2.img
