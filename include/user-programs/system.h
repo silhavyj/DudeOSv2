@@ -8,6 +8,7 @@ extern "C" {
     void *_umalloc(unsigned int size);
     void _ufree(void *addr);
     unsigned int _uexec(const char *program);
+    void _ps();
    // void _uprint(const char *str);
 }
 

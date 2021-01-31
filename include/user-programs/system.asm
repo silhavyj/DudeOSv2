@@ -24,3 +24,9 @@ _uexec:
     mov     eax, 105
     int     0x80
     ret
+
+[global _ps]
+_ps:
+    mov     eax, 107
+    int     0x80
+    ret
