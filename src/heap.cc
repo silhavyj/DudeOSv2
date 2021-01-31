@@ -1,6 +1,6 @@
-#include <heap.h>
-#include <paging.h>
-#include <drivers/screen.h>
+#include "heap.h"
+#include "paging.h"
+#include "drivers/screen.h"
 
 heap_t kernel_heap;
 

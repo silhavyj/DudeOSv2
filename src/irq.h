@@ -1,7 +1,7 @@
 #ifndef _IRQ_H_
 #define _IRQ_H_
 
-#include <stdlib/stdint.h>
+#include "stdlib/stdint.h"
 
 // ports associated with PIC
 #define PIC_ACK               0x20  // let pic know we're done dealing with the interrupt 

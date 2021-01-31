@@ -1,7 +1,7 @@
 #ifndef _IDT_H_
 #define _IDT_H_
 
-#include <stdlib/stdint.h>
+#include "stdlib/stdint.h"
 
 // maximum number of interrupts in the system
 #define IDT_ENTRIES_NUM 256

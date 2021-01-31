@@ -1,10 +1,10 @@
-#include <process.h>
-#include <heap.h>
-#include <stdlib/list.h>
-#include <stdlib/string.h>
-#include <filesystem.h>
-#include <paging.h>
-#include <drivers/screen.h>
+#include "process.h"
+#include "heap.h"
+#include "stdlib/list.h"
+#include "stdlib/string.h"
+#include "filesystem.h"
+#include "paging.h"
+#include "drivers/screen.h"
 
 list_t *all_processes;              // queue
 list_t *ready_processes;            // queue
@@ -112,15 +112,22 @@ void switch_process() {
         running_process = (PCB_t *)ready_processes->first->data;
         list_remove(ready_processes, 0, NULL);
     }
-    set_color(FOREGROUND_DARKGRAY);
-    kprintf("scheduled: pid=%x name=%s\n", running_process->pid, running_process->name);
-    reset_color();
+    #ifdef SCHEDULER_DEBUG
+        set_color(FOREGROUND_YELLOW);
+        kprintf("scheduled: pid=%x name=%s\n", running_process->pid, running_process->name);
+        reset_color();
+    #endif
     process_load_context(running_process);
 }
 
 void set_process_as_ready(PCB_t *pcb) {
     pcb->state = PROCESS_STATE_READY;
     list_add_last(ready_processes, pcb);
+}
+
+void set_process_to_run_next(PCB_t *pcb) {
+    pcb->state = PROCESS_STATE_READY;
+    list_add_first(ready_processes, pcb);
 }
 
 PCB_t *create_process(const char *process_name) {

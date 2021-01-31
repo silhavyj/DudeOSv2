@@ -1,7 +1,7 @@
 #ifndef _GDT_H_
 #define _GDT_H_
 
-#include <stdlib/stdint.h>
+#include "stdlib/stdint.h"
 
 // define individual segments so 
 // we don't have magic number throughout the code

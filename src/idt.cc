@@ -1,11 +1,11 @@
-#include <idt.h>
-#include <irq.h>
-#include <gdt.h>
-#include <support.h>
-#include <process.h>
-#include <syscalls.h>
-#include <drivers/screen.h>
-#include <drivers/keyboard.h>
+#include "idt.h"
+#include "irq.h"
+#include "gdt.h"
+#include "support.h"
+#include "process.h"
+#include "syscalls.h"
+#include "drivers/screen.h"
+#include "drivers/keyboard.h"
 
 IDT_descriptor_t idt_desc;
 IDT_entry_t idt[IDT_ENTRIES_NUM];

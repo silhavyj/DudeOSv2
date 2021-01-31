@@ -1,7 +1,7 @@
-#include <stdlib/string.h>
-#include <stdlib/memory.h>
-#include <stdlib/math.h>
-#include <stdlib/limits.h>
+#include "string.h"
+#include "memory.h"
+#include "math.h"
+#include "limits.h"
 
 static int int_to_ascii_pos(int x, char str[], int pos);
 

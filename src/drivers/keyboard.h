@@ -1,7 +1,7 @@
 #ifndef _KEYBOARD_H_
 #define _KEYBOARD_H_
 
-#include <stdlib/stdint.h>
+#include "../stdlib/stdint.h"
 
 #define KEYBOARD_BUFF_SIZE 64     // keyboard buffer is 64B
 #define KEYBOARD_DATA_PORT 0x60

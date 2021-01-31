@@ -1,14 +1,14 @@
-#include <gdt.h>
-#include <idt.h>
-#include <irq.h>
-#include <support.h>
-#include <paging.h>
-#include <heap.h>
-#include <filesystem.h>
-#include <stdlib/string.h>
-#include <drivers/screen.h>
-#include <drivers/keyboard.h>
-#include <process.h>
+#include "gdt.h"
+#include "idt.h"
+#include "irq.h"
+#include "support.h"
+#include "paging.h"
+#include "heap.h"
+#include "filesystem.h"
+#include "stdlib/string.h"
+#include "drivers/screen.h"
+#include "drivers/keyboard.h"
+#include "process.h"
 
 void print_os_logo();
 void init(void (*init_fce)(), const char *msg);

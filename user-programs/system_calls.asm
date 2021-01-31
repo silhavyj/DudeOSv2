@@ -30,3 +30,10 @@ _ps:
     mov     eax, 107
     int     0x80
     ret
+
+[global _uprint]
+_uprint:
+    mov     esi, [esp + 4]
+    mov     eax, 101
+    int     0x80
+    ret

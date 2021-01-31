@@ -1,7 +1,7 @@
 #ifndef _MEMORY_H_
 #define _MEMORY_H_
 
-#include <stdlib/stdint.h>
+#include "stdint.h"
 
 void memcpy(char *dst, const char* src, uint32_t n);
 void memset(char *dst, unsigned char value, uint32_t n);

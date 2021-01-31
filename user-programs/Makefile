@@ -5,7 +5,7 @@ CXXFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 LD       = ld
 LDFLAGS  = --Ttext 0x0 --oformat binary -m elf_i386
 
-programs     = idle shell error
+programs     = idle shell error dummy
 header_files = $(programs:=.bin.h)
 bin_files    = $(programs:=.bin)
 
@@ -14,7 +14,10 @@ all: $(header_files)
 %.bin.h: %.bin 
 	xxd -i $< $@
  
-%.bin: %.o system.o
+%.bin: %.o ../src/stdlib/memory.o  \
+		   ../src/stdlib/string.o  \
+		   ../src/stdlib/math.o    \
+		   system.o system_calls.o
 	$(LD) $(LDFLAGS) $^ -o $@
 
 %.o: %.cc

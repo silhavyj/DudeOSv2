@@ -1,9 +1,11 @@
 #ifndef _PROCESS_H_
 #define _PROCESS_H_
 
-#include <idt.h>
-#include <heap.h>
-#include <stdlib/stdint.h>
+#include "idt.h"
+#include "heap.h"
+#include "stdlib/stdint.h"
+
+#define SCHEDULER_DEBUG
 
 #define PROCESS_NAME_LEN 32
 #define PROCESS_UNUSED_PAGE 0xFFFFFFFF
@@ -38,6 +40,7 @@ void print_all_processes();
 void process_load_context(PCB_t *pcb);
 void switch_process();
 void set_process_as_ready(PCB_t *pcb);
+void set_process_to_run_next(PCB_t *pcb);
 void kill_process(PCB_t *pcb);
 PCB_t *get_running_process();
 uint32_t get_kernel_ESP();

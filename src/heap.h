@@ -1,7 +1,7 @@
 #ifndef _HEAP_H_
 #define _HEAP_H_
 
-#include <stdlib/stdint.h>
+#include "stdlib/stdint.h"
 
 typedef struct heap_element {
     uint8_t free;

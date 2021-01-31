@@ -1,8 +1,8 @@
 #ifndef _SCREEN_H_
 #define _SCREEN_H_
 
-#include <drivers/colors.h>
-#include <stdlib/stdint.h>
+#include "../drivers/colors.h"
+#include "../stdlib/stdint.h"
 
 #define SCREEN_BUFFER_SIZE 128
 #define MAX_ROWS 25

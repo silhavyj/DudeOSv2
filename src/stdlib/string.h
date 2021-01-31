@@ -1,8 +1,8 @@
 #ifndef _STRING_H_
 #define _STRING_H_
 
-#include <stdlib/stdint.h>
-#include <stdlib/stdarg.h>
+#include "stdint.h"
+#include "stdarg.h"
 
 uint32_t strlen(const char *str);
 int strcmp(const char *str1, const char *str2);

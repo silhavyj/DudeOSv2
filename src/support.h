@@ -1,7 +1,7 @@
 #ifndef _SUPPORT_H_
 #define _SUPPORT_H_
 
-#include <stdlib/stdint.h>
+#include "stdlib/stdint.h"
 
 extern "C" {
     void _outb(uint16_t port, uint8_t data);

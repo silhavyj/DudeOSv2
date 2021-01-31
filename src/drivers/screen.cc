@@ -1,8 +1,8 @@
-#include <drivers/screen.h>
-#include <stdlib/string.h>
-#include <stdlib/stdarg.h>
-#include <stdlib/memory.h>
-#include <support.h>
+#include "screen.h"
+#include "../stdlib/string.h"
+#include "../stdlib/stdarg.h"
+#include "../stdlib/memory.h"
+#include "../support.h"
 
 uint8_t color_ctrl;
 uint32_t current_cursor_pos;

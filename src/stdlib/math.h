@@ -1,7 +1,7 @@
 #ifndef _MATH_H_
 #define _MATH_H_
 
-#include <stdlib/stdint.h>
+#include "stdint.h"
 
 #define abs(x) ((x) < 0 ? (-x) : (x))
 #define max(x, y) ((x) > (y) ? (x) : (y))

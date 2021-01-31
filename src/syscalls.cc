@@ -1,8 +1,8 @@
-#include <syscalls.h>
-#include <heap.h>
-#include <process.h>
-#include <drivers/screen.h>
-#include <stdlib/stdint.h>
+#include "syscalls.h"
+#include "heap.h"
+#include "process.h"
+#include "drivers/screen.h"
+#include "stdlib/stdint.h"
 
 void handle_systemcall(int_registers_t *regs) {
     switch (regs->eax) {
@@ -45,8 +45,11 @@ void syscall_exit() {
 // prints string which address is in esi
 void syscall_print(int_registers_t *regs) {
     PCB_t *pcb = get_running_process();
-    kprintf("%s(0x%x): %s", pcb->name, pcb->pid, (char *)regs->esi);
-    set_process_as_ready(pcb);
+    set_color(FOREGROUND_DARKGRAY);
+    kprintf("%s (0x%x): ", pcb->name, pcb->pid);
+    reset_color();
+    kprintf("%s", (char *)regs->esi);
+    set_process_to_run_next(pcb);
 }
 
 // reads line from console and copies it in [edi]
@@ -58,14 +61,14 @@ void syscall_readln() {
 void syscall_malloc() {
     PCB_t *pcb = get_running_process();
     pcb->registers.EAX = (uint32_t)heap_malloc(&pcb->heap, pcb->registers.EBX);
-    set_process_as_ready(pcb);
+    set_process_to_run_next(pcb);
 }
 
 // frees memory in process heap, address is in EBX
 void syscall_free() {
     PCB_t *pcb = get_running_process();
     heap_free(&pcb->heap, (void *)pcb->registers.EBX);
-    set_process_as_ready(pcb);
+    set_process_to_run_next(pcb);
 }
 
 // creates new process and puts it in ready queue, process name string address is in EBX, process id is returned in EAX

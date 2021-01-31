@@ -1,5 +1,5 @@
-#include <stdlib/list.h>
-#include <heap.h>
+#include "list.h"
+#include "../heap.h"
 
 static list_node_t *list_node_create(void *data);
 

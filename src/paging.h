@@ -1,7 +1,7 @@
 #ifndef _PAGING_H_
 #define _PAGING_H_
 
-#include <stdlib/stdint.h>
+#include "stdlib/stdint.h"
 
 // frames
 #define FRAMES_COUNT (128 * 1024)

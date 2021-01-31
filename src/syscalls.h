@@ -1,7 +1,7 @@
 #ifndef _SYSCALLS_H_
 #define _SYSCALLS_H_
 
-#include <idt.h>
+#include "idt.h"
 
 #define SYSCALL_EXIT              100
 #define SYSCALL_PRINT             101

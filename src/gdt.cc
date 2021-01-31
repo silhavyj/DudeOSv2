@@ -1,6 +1,6 @@
-#include <gdt.h>
-#include <support.h>
-#include <stdlib/memory.h>
+#include "gdt.h"
+#include "support.h"
+#include "stdlib/memory.h"
 
 GDT_descriptor_t gdt_desc;
 GDT_entry_t gdt[5]; // for now we define fine different segments
