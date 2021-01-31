@@ -2,6 +2,7 @@
 #include "keymap.h"
 #include "../drivers/screen.h"
 #include "../stdlib/memory.h"
+#include "../process.h"
 
 char keyboard_buffer[KEYBOARD_BUFF_SIZE];
 uint8_t keyboard_buff_pos = 0;
@@ -64,8 +65,10 @@ void process_key(uint8_t scan_code) {
             keyboard_buff_pos--;
     } else if (symbol == ENTER_KEY_CODE) {
         // TODO wake up a process waiting for a keyboard interrupt
-        keyboard_buff_pos = 0;
         kprintf("\n");
+        keyboard_buffer[keyboard_buff_pos] = '\0';
+        keyboard_create_resource(keyboard_buffer);
+        keyboard_buff_pos = 0;
     }
     else if (pressed && symbol != 0) {
         kprintf("%c", symbol);

@@ -3,6 +3,7 @@
 #include "process.h"
 #include "drivers/screen.h"
 #include "stdlib/stdint.h"
+#include "filesystem.h"
 
 void handle_systemcall(int_registers_t *regs) {
     switch (regs->eax) {
@@ -31,6 +32,10 @@ void handle_systemcall(int_registers_t *regs) {
             print_all_processes();
             set_process_as_ready(get_running_process());
             break;
+        case SYSCALL_PRINT_ALL_PROGRAMS:
+            list_all_files();
+            set_process_as_ready(get_running_process());
+            break;
         default:
             kprintf("@---KERNEL--- unknown syscall\n");
             break;
@@ -45,16 +50,18 @@ void syscall_exit() {
 // prints string which address is in esi
 void syscall_print(int_registers_t *regs) {
     PCB_t *pcb = get_running_process();
-    set_color(FOREGROUND_DARKGRAY);
-    kprintf("%s (0x%x): ", pcb->name, pcb->pid);
-    reset_color();
-    kprintf("%s", (char *)regs->esi);
+    if (*(char *)regs->esi != '\n') {
+        set_color(FOREGROUND_DARKGRAY);
+        kprintf("%s (0x%x): ", pcb->name, pcb->pid);
+        reset_color();
+        kprintf("%s", (char *)regs->esi);
+    }
     set_process_to_run_next(pcb);
 }
 
 // reads line from console and copies it in [edi]
 void syscall_readln() {
-    //keyboard_ask_resource();
+    keyboard_ask_resource();
 }
 
 // allocates memory in process heap, size is in EBX, returns address in EAX

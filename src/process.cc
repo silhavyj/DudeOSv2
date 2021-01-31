@@ -183,17 +183,17 @@ PCB_t *create_process(const char *process_name) {
 }
 
 void process_save_context(PCB_t *pcb, int_registers_t *regs) {
-    pcb->registers.EAX = regs->eax;
-    pcb->registers.EBX = regs->ebx;
-    pcb->registers.ECX = regs->ecx;
-    pcb->registers.EDX = regs->edx;
-    pcb->registers.ESI = regs->esi;
-    pcb->registers.EDI = regs->edi;
-    pcb->registers.ESP = regs->esp + 12;
-    pcb->registers.EBP = regs->ebp;
+    pcb->registers.EAX     = regs->eax;
+    pcb->registers.EBX     = regs->ebx;
+    pcb->registers.ECX     = regs->ecx;
+    pcb->registers.EDX     = regs->edx;
+    pcb->registers.ESI     = regs->esi;
+    pcb->registers.EDI     = regs->edi;
+    pcb->registers.ESP     = regs->esp + 12;
+    pcb->registers.EBP     = regs->ebp;
     pcb->registers.E_FLAGS = regs->eflags;
-    pcb->registers.EIP = regs->eip;
-    pcb->registers.CS = regs->cs;
+    pcb->registers.EIP     = regs->eip;
+    pcb->registers.CS      = regs->cs;
 }
 
 void process_load_context(PCB_t *pcb) {
@@ -208,8 +208,6 @@ void process_load_context(PCB_t *pcb) {
         }
 
     pages_refresh();
-
-    kernel_ESP = 0x6504FE0;
 
     asm (
         "push %0;"
@@ -280,4 +278,36 @@ PCB_t *get_running_process() {
 
 uint32_t get_kernel_ESP() {
     return kernel_ESP;
+}
+
+void keyboard_ask_resource() {
+    running_process->state = PROCESS_STATE_WAITING;
+    list_remove_data(ready_processes, (void *)running_process->pid, NULL);
+    list_add_last(waiting_processes, (void *)running_process->pid);
+    list_add_first(waiting_keyboard_processes, (void *)running_process->pid);
+}
+
+void keyboard_create_resource(char *input) {
+    int i;
+    PCB_t *pcb = (PCB_t *)list_get(waiting_keyboard_processes, 0);
+    if (pcb == NULL)
+        return;
+    
+    // remove process from waiting queues
+    list_remove(waiting_keyboard_processes, 0, NULL);
+    list_remove_data(waiting_processes, (void *)pcb->pid, NULL);
+
+    pcb->state = PROCESS_STATE_READY;
+
+    // copy input buffer to process memory - address is in EDI
+     for (i = 0; i < PROCESS_MAX_MEMORY_PAGES; i++)
+        if (pcb->pages[i] != PROCESS_UNUSED_PAGE)
+            map_page(i * FRAME_SIZE, pcb->pages[i]);
+    
+    strcpy((char *)pcb->registers.EDI, input);
+
+    // add process to ready queue
+    list_add_first(ready_processes, (void *)pcb->pid);
+
+    set_process_as_ready(running_process);
 }

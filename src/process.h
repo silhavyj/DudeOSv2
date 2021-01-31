@@ -5,7 +5,7 @@
 #include "heap.h"
 #include "stdlib/stdint.h"
 
-#define SCHEDULER_DEBUG
+//#define SCHEDULER_DEBUG
 
 #define PROCESS_NAME_LEN 32
 #define PROCESS_UNUSED_PAGE 0xFFFFFFFF
@@ -44,5 +44,8 @@ void set_process_to_run_next(PCB_t *pcb);
 void kill_process(PCB_t *pcb);
 PCB_t *get_running_process();
 uint32_t get_kernel_ESP();
+
+void keyboard_ask_resource();
+void keyboard_create_resource(char *input);
 
 #endif

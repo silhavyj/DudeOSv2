@@ -12,6 +12,8 @@ extern "C" {
     unsigned int _uexec(const char *program);
     void _ps();
     void _uprint(const char *str);
+    void _ureadln(char *dest);
+    void _show_programs();
 }
 
 #endif

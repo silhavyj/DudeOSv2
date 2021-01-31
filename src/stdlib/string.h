@@ -6,6 +6,7 @@
 
 uint32_t strlen(const char *str);
 int strcmp(const char *str1, const char *str2);
+int strcmp(const char *str1, const char *str2, int n);
 void strcpy(char *dst, const char *src);
 void reverse(char *str);
 void append(char *str, char c);

@@ -37,3 +37,16 @@ _uprint:
     mov     eax, 101
     int     0x80
     ret
+
+[global _ureadln]
+_ureadln:
+    mov     edi, [esp + 4]
+    mov     eax, 102
+    int     0x80
+    ret
+
+[global _show_programs]
+_show_programs:
+    mov     eax, 108
+    int     0x80
+    ret

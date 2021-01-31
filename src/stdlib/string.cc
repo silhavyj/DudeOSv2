@@ -28,6 +28,10 @@ int strcmp(const char *str1, const char *str2) {
     return memcmp(str1, str2, strlen(str1));
 }
 
+int strcmp(const char *str1, const char *str2, int n) {
+     return memcmp(str1, str2, n);
+}
+
 void strcpy(char *dst, const char *src) {
     uint32_t len = strlen(src);
     memcpy(dst, src, len);

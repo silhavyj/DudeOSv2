@@ -73,7 +73,13 @@ void _int0x80_handler(int_registers_t regs) {
 
 // PIT (system timer) handler
 void _int0x20_handler(int_registers_t regs) {
+ asm("mov %0, %%esp" : : "r" (get_kernel_ESP()));
+    PCB_t *running_process = get_running_process();
+    process_save_context(running_process, &regs);
+    set_process_as_ready(running_process);
+
     _outb(PIC_MASTER_CMD_PORT, PIC_ACK);
+    switch_process();
 }
 
 // keyboard handler
