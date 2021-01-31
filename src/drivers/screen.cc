@@ -78,18 +78,8 @@ void print_backspace() {
 }
 
 void kprintf(const char *str, ...) {
-    uint32_t i;
-    uint32_t args_count = 0;
     va_list valist;
-    uint32_t len = strlen(str);
-
-    for (i = 0; i < len; i++)
-        if (str[i] == '%') {
-            if (i < len - 1 && str[i + 1] != '%')
-                args_count++;
-        }
-
-    va_start(valist, args_count);
+    va_start(valist, str);
     memset(screen_buffer, '\0', SCREEN_BUFFER_SIZE);
     va_stringf(screen_buffer, str, valist);
     kputs(screen_buffer);
