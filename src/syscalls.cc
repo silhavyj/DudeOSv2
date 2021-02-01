@@ -52,7 +52,7 @@ void syscall_print(int_registers_t *regs) {
     PCB_t *pcb = get_running_process();
     if (*(char *)regs->esi != '\n') {
         set_color(FOREGROUND_DARKGRAY);
-        kprintf("%s (0x%x): ", pcb->name, pcb->pid);
+        kprintf("%s (%d): ", pcb->name, pcb->pid);
         reset_color();
         kprintf("%s", (char *)regs->esi);
     }
@@ -92,5 +92,10 @@ void syscall_exec_program() {
 void syscall_terminate_process() {
     PCB_t *pcb = get_running_process();
     set_process_as_ready(pcb);
-    kill_process((PCB_t *)pcb->registers.EBX);
+    if (process_exists(pcb->registers.EBX) != 1)
+        pcb->registers.EAX = 1;
+    else {
+        pcb->registers.EAX = 0;
+        kill_process((PCB_t *)pcb->registers.EBX);
+    }
 }

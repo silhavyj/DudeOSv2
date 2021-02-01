@@ -28,8 +28,11 @@ int main() {
             _show_programs();
         else if (strcmp(line, KILL, strlen(KILL)) == 0) {
             pid = atoi(line + strlen(KILL) + 1);
-            if (pid != 0)
-                _uprintf("%d\n", pid);
+            if (pid != 0) {
+                if (_ukill(pid) != 0)
+                    _uprintf("invalid pid!\n");
+            } else
+                _uprintf("invalid pid!\n");
         }
         else if (strlen(line) != 0)
             _uprintf("unknown command!\n");

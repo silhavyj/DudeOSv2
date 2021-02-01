@@ -22,7 +22,7 @@ void print_pcb(void *addr) {
     set_color(FOREGROUND_LIGHTGRAY);
     kprintf("PID=");
     reset_color();
-    kprintf("%x ", (uint32_t)pcb);
+    kprintf("%d ", (uint32_t)pcb);
 
     set_color(FOREGROUND_LIGHTGRAY);
     kprintf("name=");
@@ -310,4 +310,12 @@ void keyboard_create_resource(char *input) {
     list_add_first(ready_processes, (void *)pcb->pid);
 
     set_process_as_ready(running_process);
+}
+
+uint8_t pcb_comapre(void *pcb1, void *pcb2) {
+    return (uint32_t)pcb1 == (uint32_t)pcb2;
+}
+
+int process_exists(uint32_t addr) {
+    return list_contains(all_processes, (void *)addr, &pcb_comapre) == 1;
 }

@@ -44,6 +44,7 @@ void set_process_to_run_next(PCB_t *pcb);
 void kill_process(PCB_t *pcb);
 PCB_t *get_running_process();
 uint32_t get_kernel_ESP();
+int process_exists(uint32_t addr);
 
 void keyboard_ask_resource();
 void keyboard_create_resource(char *input);
