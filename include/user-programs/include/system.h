@@ -14,6 +14,7 @@ extern "C" {
     void _uprint(const char *str);
     void _ureadln(char *dest);
     void _show_programs();
+    void _ukill(unsigned int pid);
 }
 
 #endif

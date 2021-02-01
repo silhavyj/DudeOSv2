@@ -25,11 +25,15 @@ uint32_t strlen(const char *str) {
 }
 
 int strcmp(const char *str1, const char *str2) {
-    return memcmp(str1, str2, strlen(str1));
+    uint32_t len1 = strlen(str1);
+    /*uint32_t len2 = strlen(str2);
+    if (len1 != len2)
+        return 0;*/
+    return memcmp(str1, str2, len1);
 }
 
 int strcmp(const char *str1, const char *str2, int n) {
-     return memcmp(str1, str2, n);
+    return memcmp(str1, str2, n);
 }
 
 void strcpy(char *dst, const char *src) {

@@ -5,13 +5,13 @@
 #include <user-programs/exe/idle.bin.h>
 #include <user-programs/exe/shell.bin.h>
 #include <user-programs/exe/error.bin.h>
-#include <user-programs/exe/dummy.bin.h>
+#include <user-programs/exe/test_malloc.bin.h>
 
 const file_t files[] {
     { "idle.exe",  sizeof(exe_idle_bin),  exe_idle_bin  },
     { "shell.exe", sizeof(exe_shell_bin), exe_shell_bin },
     { "error.exe", sizeof(exe_error_bin), exe_error_bin },
-    { "dummy.exe", sizeof(exe_dummy_bin), exe_dummy_bin }
+    { "test_malloc.exe", sizeof(exe_test_malloc_bin), exe_test_malloc_bin }
 };
 
 uint32_t files_count = 0;

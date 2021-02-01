@@ -50,3 +50,10 @@ _show_programs:
     mov     eax, 108
     int     0x80
     ret
+
+[global _ukill]
+_ukill:
+    mov     ebx, [esp + 4]
+    mov     eax, 106
+    int     0x80
+    ret

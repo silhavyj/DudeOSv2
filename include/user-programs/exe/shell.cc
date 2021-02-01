@@ -1,24 +1,36 @@
 #include <system.h>
 #include <stdlib/string.h>
 
+#define HELP          "help"
+#define EXEC          "exec"
+#define PS            "ps"
+#define KILL          "kill"
+#define SHOW_PROGRAMS "show programs"
+
 void print_help();
 
 int main() {
+    unsigned int pid;
     char *line = (char *)_umalloc(256);
 
     while (1) {
         _uprintf("/> ");
         _ureadln(line);
-        if (strcmp(line, "help", 4) == 0)
+        if (strcmp(line, HELP, strlen(HELP)) == 0)
             print_help();
-        else if (strcmp(line, "exec", 4) == 0) {
-            if (_uexec(line + 5) == 0)
+        else if (strcmp(line, EXEC, strlen(EXEC)) == 0) {
+            if (_uexec(line + strlen(EXEC) + 1) == 0)
                 _uprintf("program not found!\n");
         }
-        else if (strcmp(line, "ps", 2) == 0)
+        else if (strcmp(line, PS, strlen(PS)) == 0)
             _ps();
-        else if (strcmp(line, "show programs", 13) == 0)
+        else if (strcmp(line, SHOW_PROGRAMS, strlen(SHOW_PROGRAMS)) == 0)
             _show_programs();
+        else if (strcmp(line, KILL, strlen(KILL)) == 0) {
+            pid = atoi(line + strlen(KILL) + 1);
+            if (pid != 0)
+                _uprintf("%d\n", pid);
+        }
         else if (strlen(line) != 0)
             _uprintf("unknown command!\n");
     }
@@ -29,5 +41,6 @@ void print_help() {
     _uprintf("help           - prints out this text\n");
     _uprintf("exec <program> - executes the program\n");
     _uprintf("show programs  - prints out all programs available\n");
+    _uprintf("kill <pid>     - kills the process\n");
     _uprintf("ps             - prints out all processes\n");
 }
