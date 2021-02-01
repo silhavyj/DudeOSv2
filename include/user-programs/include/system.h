@@ -15,6 +15,7 @@ extern "C" {
     void _ureadln(char *dest);
     void _show_programs();
     int _ukill(unsigned int pid);
+    int _ufork();
 }
 
 #endif
