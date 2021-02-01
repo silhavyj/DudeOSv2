@@ -1,9 +1,9 @@
-#include "syscalls.h"
-#include "heap.h"
-#include "process.h"
-#include "drivers/screen.h"
-#include "stdlib/stdint.h"
-#include "filesystem.h"
+#include <syscalls.h>
+#include <heap.h>
+#include <process.h>
+#include <drivers/screen.h>
+#include <stdlib/stdint.h>
+#include <filesystem.h>
 
 void handle_systemcall(int_registers_t *regs) {
     switch (regs->eax) {

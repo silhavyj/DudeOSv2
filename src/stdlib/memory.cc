@@ -1,4 +1,4 @@
-#include "memory.h"
+#include <stdlib/memory.h>
 
 void memcpy(char *dst, const char* src, uint32_t n) {
     uint32_t i;

@@ -1,8 +1,8 @@
-#include "keyboard.h"
-#include "keymap.h"
-#include "../drivers/screen.h"
-#include "../stdlib/memory.h"
-#include "../process.h"
+#include <drivers/keyboard.h>
+#include <drivers/keymap.h>
+#include <drivers/screen.h>
+#include <stdlib/memory.h>
+#include <process.h>
 
 char keyboard_buffer[KEYBOARD_BUFF_SIZE];
 uint8_t keyboard_buff_pos = 0;

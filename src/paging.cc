@@ -1,7 +1,7 @@
-#include "paging.h"
-#include "drivers/screen.h"
-#include "support.h"
-#include "gdt.h"
+#include <paging.h>
+#include <drivers/screen.h>
+#include <support.h>
+#include <gdt.h>
 
 uint8_t frames[FRAMES_COUNT];
 page_dir_t *page_dir;

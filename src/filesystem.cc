@@ -1,17 +1,17 @@
-#include "filesystem.h"
-#include "drivers/screen.h"
-#include "stdlib/string.h"
+#include <filesystem.h>
+#include <drivers/screen.h>
+#include <stdlib/string.h>
 
-#include "../user-programs/idle.bin.h"
-#include "../user-programs/shell.bin.h"
-#include "../user-programs/error.bin.h"
-#include "../user-programs/dummy.bin.h"
+#include <user-programs/exe/idle.bin.h>
+#include <user-programs/exe/shell.bin.h>
+#include <user-programs/exe/error.bin.h>
+#include <user-programs/exe/dummy.bin.h>
 
 const file_t files[] {
-    { "idle.exe",  sizeof(idle_bin),  idle_bin  },
-    { "shell.exe", sizeof(shell_bin), shell_bin },
-    { "error.exe", sizeof(error_bin), error_bin },
-    { "dummy.exe", sizeof(dummy_bin), dummy_bin }
+    { "idle.exe",  sizeof(exe_idle_bin),  exe_idle_bin  },
+    { "shell.exe", sizeof(exe_shell_bin), exe_shell_bin },
+    { "error.exe", sizeof(exe_error_bin), exe_error_bin },
+    { "dummy.exe", sizeof(exe_dummy_bin), exe_dummy_bin }
 };
 
 uint32_t files_count = 0;

@@ -1,10 +1,10 @@
-#include "process.h"
-#include "heap.h"
-#include "stdlib/list.h"
-#include "stdlib/string.h"
-#include "filesystem.h"
-#include "paging.h"
-#include "drivers/screen.h"
+#include <process.h>
+#include <heap.h>
+#include <stdlib/list.h>
+#include <stdlib/string.h>
+#include <filesystem.h>
+#include <paging.h>
+#include <drivers/screen.h>
 
 list_t *all_processes;              // queue
 list_t *ready_processes;            // queue

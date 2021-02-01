@@ -1,5 +1,5 @@
-#include "irq.h"
-#include "support.h"
+#include <irq.h>
+#include <support.h>
 
 void remap_irq() {
     // initialize the PICs

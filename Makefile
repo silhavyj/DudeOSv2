@@ -15,7 +15,7 @@ LD          = ld
 CXX         = g++
 CXX_FLAGS   = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector  \
 			  -fno-pic -std=c++14 -fno-rtti -fno-exceptions -Wall -Wextra \
-			  -fno-leading-underscore -Wno-write-strings
+			  -fno-leading-underscore -Wno-write-strings -Iinclude
 			  
 LD_FLAGS    = --Ttext $(KERNEL_START_CODE) -m elf_i386 -s --oformat binary -e $(KERNEL_MAIN)
 
@@ -27,7 +27,7 @@ $(OS_IMAGE) : $(OBJ_FILES)
 	cat boot/boot.bin $(OS_BIN) /dev/zero | head -c 1474560 > $(OS_IMAGE)
 
 user_programs:
-	make -C user-programs
+	make -C include/user-programs
 
 %.o : %.cc
 	$(CXX) $(CXX_FLAGS) -c $^ -o $@
@@ -48,7 +48,7 @@ run: user_programs $(OS_IMAGE)
 
 .PHONY clean:
 clean:
-	make -C user-programs clean
+	make -C include/user-programs clean
 	make -C boot clean
 	find -name '*.o' | xargs $(RM)
 	$(RM) $(OS_IMAGE)
