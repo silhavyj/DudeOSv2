@@ -12,4 +12,4 @@ This project is for educational purposes only and was inspired by the following 
 
 Screenshots
 ===========
-.. image:: doc/img01.png
+![Screenshot](doc/img01.png)
