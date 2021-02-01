@@ -4,6 +4,7 @@
 #include <drivers/screen.h>
 #include <stdlib/stdint.h>
 #include <filesystem.h>
+#include <paging.h>
 
 void handle_systemcall(int_registers_t *regs) {
     switch (regs->eax) {
@@ -106,28 +107,15 @@ void syscall_terminate_process() {
 // forks the the process
 void syscall_fork() {
     PCB_t *pcb = get_running_process();
-    PCB_t *fork_process = create_process(pcb->name);
-    
-    fork_process->registers.EAX = pcb->registers.EAX;
-    fork_process->registers.EBX = pcb->registers.EBX;
-    fork_process->registers.ECX = pcb->registers.ECX;
-    fork_process->registers.EDX = pcb->registers.EDX;
-    fork_process->registers.ESP = pcb->registers.ESP;
-    fork_process->registers.EBP = pcb->registers.EBP;
-    fork_process->registers.ESI = pcb->registers.ESI;
-    fork_process->registers.EDI = pcb->registers.EDI;
-    fork_process->registers.E_FLAGS = pcb->registers.E_FLAGS;
-    fork_process->registers.EIP = pcb->registers.EIP;
-    fork_process->registers.CS = pcb->registers.CS;
-    fork_process->registers.SS = pcb->registers.SS;
-    fork_process->registers.DS = pcb->registers.DS;
-    fork_process->registers.ES = pcb->registers.ES;
-    fork_process->registers.FS = pcb->registers.FS;
-    fork_process->registers.GS = pcb->registers.GS;
+    /*PCB_t *fork_process = create_process(pcb->name);
+
+    copy_process(fork_process, pcb);
 
     fork_process->registers.EAX = 0;    // child
-    pcb->registers.EAX = 1;             // parent
+    pcb->registers.EAX = 1;             // parent*/
 
-    //set_process_as_ready(fork_process);
+    //set_process_to_run_next(pcb);
+    
+    pcb->registers.EAX = 1;             // parent
     set_process_as_ready(pcb);
 }
