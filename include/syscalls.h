@@ -12,6 +12,7 @@
 #define SYSCALL_TERMINATE_PROCESS  106
 #define SYSCALL_PRINT_PROCESSES    107
 #define SYSCALL_PRINT_ALL_PROGRAMS 108
+#define SYSCALL_CLEAR              109
 
 void handle_systemcall(int_registers_t *regs);
 void syscall_exit();
@@ -21,5 +22,6 @@ void syscall_malloc();
 void syscall_free();
 void syscall_exec_program();
 void syscall_terminate_process();
+void syscall_clear_screen();
 
 #endif

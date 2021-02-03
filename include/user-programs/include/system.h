@@ -16,6 +16,7 @@ extern "C" {
     void _show_programs();
     int _ukill(unsigned int pid);
     int _ufork();
+    void _uclear();
 }
 
 #endif

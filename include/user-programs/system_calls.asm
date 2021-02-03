@@ -87,3 +87,9 @@ _ukill:
     mov     eax, 106
     int     0x80
     ret
+
+[global _uclear]
+_uclear:
+    mov     eax, 109
+    int     0x80
+    ret

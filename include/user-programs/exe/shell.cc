@@ -6,6 +6,7 @@
 #define PS            "ps"
 #define KILL          "kill"
 #define SHOW_PROGRAMS "show programs"
+#define CLEAR         "clear"
 
 void print_help();
 
@@ -34,6 +35,8 @@ int main() {
             } else
                 _uprintf("invalid pid!\n");
         }
+        else if (strcmp(line, CLEAR, strlen(CLEAR)) == 0)
+            _uclear();
         else if (strlen(line) != 0)
             _uprintf("unknown command!\n");
     }
@@ -46,4 +49,5 @@ void print_help() {
     _uprintf("show programs  - prints out all programs available\n");
     _uprintf("kill <pid>     - kills the process\n");
     _uprintf("ps             - prints out all processes\n");
+    _uprintf("clear          - clears the screen\n");
 }

@@ -37,6 +37,9 @@ void handle_systemcall(int_registers_t *regs) {
             list_all_files();
             set_process_as_ready(get_running_process());
             break;
+        case SYSCALL_CLEAR:
+            syscall_clear_screen();
+            break;
         default:
             kprintf("@---KERNEL--- unknown syscall\n");
             break;
@@ -99,4 +102,11 @@ void syscall_terminate_process() {
         pcb->registers.EAX = 0;
         kill_process((PCB_t *)pcb->registers.EBX);
     }
+}
+
+// clears up the screen
+void syscall_clear_screen() {
+    PCB_t *pcb = get_running_process();
+    clear_screen();
+    set_process_to_run_next(pcb);
 }
