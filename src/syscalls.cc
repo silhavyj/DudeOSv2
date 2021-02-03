@@ -6,6 +6,7 @@
 #include <filesystem.h>
 #include <paging.h>
 #include <support.h>
+#include <stdlib/memory.h>
 
 void handle_systemcall(int_registers_t *regs) {
     switch (regs->eax) {
@@ -117,12 +118,23 @@ void syscall_clear_screen() {
 
 void syscall_fork() {
     PCB_t *pcb = get_running_process();
+
+    // create a new process of the same program
     PCB_t *child = create_process(pcb->name);
-    
-    _disable_paging();
-    copy_process(child, pcb);
-    pcb->registers.EAX = 1;
-    child->registers.EAX = 0;
+
+    // disable paging otherwise it's gonna be a page fault
+    _disable_paging(); 
+   
+    // copy the content of the stack
+    memcpy((char *)child->pages[PROCESS_MAX_MEMORY_PAGES - 2], (char *)pcb->pages[PROCESS_MAX_MEMORY_PAGES - 2], FRAME_SIZE);
+
+    // copy the content of the registers
+    memcpy((char *)&child->registers, (char *)&pcb->registers, sizeof(regs_t));
+
+    pcb->registers.EAX = 1;     // you're the parent
+    child->registers.EAX = 0;   // you're the child
+
+    // once we're done - enable paging again
     _enable_paging();
 
     set_process_to_run_next(pcb);
