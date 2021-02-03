@@ -28,7 +28,7 @@ void init_idt() {
     int i;
 
     // set all interrupts as not preset
-    // we'll set up them individualu furher down below
+    // we'll set up them individually further down below
     for (i = 0; i < IDT_ENTRIES_NUM; i++)
         idt_set_entry(i, 0, 0, IDT_NOT_PRESENT, 0, 0, IDT_32_BIT_TRAP_GATE);
 
@@ -84,6 +84,7 @@ void _int0x20_handler(int_registers_t regs) {
 
 // keyboard handler
 void _int0x21_handler(int_registers_t regs) {
+    UNUSED_PARAM(regs);
     uint8_t scancode = _inb(KEYBOARD_DATA_PORT);
     process_key(scancode);
     _outb(PIC_MASTER_CMD_PORT, PIC_ACK);
@@ -99,10 +100,6 @@ void _int0x8_handler() {
     kill_process(pcb);
     switch_process();
 }   
-
-// segment not present
-void _int0xB_handler(int_with_err_registers_t regs) {
-}
 
 // stack fault
 void _int0xC_handler() {
@@ -139,4 +136,11 @@ void _int0xE_handler(uint32_t faulting_addr) {
 
 // unknown interrupt
 void _int0xF_handler() {
+    // TODO
 }                            
+
+// segment not present
+void _int0xB_handler(int_with_err_registers_t regs) {
+    UNUSED_PARAM(regs);
+    // TODO
+}

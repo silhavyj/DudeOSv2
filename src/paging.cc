@@ -96,11 +96,11 @@ void frame_set_usage(uint32_t frame_number, uint32_t usage) {
         frames[byte_num] &= ~mask;
 }
 
-uint32_t inline frame_address(uint32_t frame_number) {
+uint32_t frame_address(uint32_t frame_number) {
     return FRAMES_START_ADDR + frame_number * FRAME_SIZE;
 }
 
-uint32_t inline frame_number(uint32_t frame_address) {
+uint32_t frame_number(uint32_t frame_address) {
     return (FRAMES_START_ADDR - frame_address) / FRAME_SIZE;
 }
 

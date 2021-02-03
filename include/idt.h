@@ -3,6 +3,8 @@
 
 #include <stdlib/stdint.h>
 
+#define UNUSED_PARAM(x) (void)(x)
+
 // maximum number of interrupts in the system
 #define IDT_ENTRIES_NUM 256
 
@@ -55,9 +57,9 @@ void init_idt();
 
 // set an idt entry (one interrupt handler)
 // index           - 0-255 in the table
-// isr_addr        - interrupt handler adrress (function)
+// isr_addr        - interrupt handler address (function)
 // segment         - segment of the interrupt - see gdt
-// present         - set to 0 for unnused intterupts
+// present         - set to 0 for unused interrupts
 // dpl             - descriptor privilege level
 // storage_segment - set to 0 for interrupt and trap gates
 // get_type        - see above

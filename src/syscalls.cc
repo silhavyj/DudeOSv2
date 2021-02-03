@@ -37,9 +37,6 @@ void handle_systemcall(int_registers_t *regs) {
             list_all_files();
             set_process_as_ready(get_running_process());
             break;
-        case SYSCALL_PRINT_FORK:
-            syscall_fork();
-            break;
         default:
             kprintf("@---KERNEL--- unknown syscall\n");
             break;
@@ -102,20 +99,4 @@ void syscall_terminate_process() {
         pcb->registers.EAX = 0;
         kill_process((PCB_t *)pcb->registers.EBX);
     }
-}
-
-// forks the the process
-void syscall_fork() {
-    PCB_t *pcb = get_running_process();
-    /*PCB_t *fork_process = create_process(pcb->name);
-
-    copy_process(fork_process, pcb);
-
-    fork_process->registers.EAX = 0;    // child
-    pcb->registers.EAX = 1;             // parent*/
-
-    //set_process_to_run_next(pcb);
-    
-    pcb->registers.EAX = 1;             // parent
-    set_process_as_ready(pcb);
 }

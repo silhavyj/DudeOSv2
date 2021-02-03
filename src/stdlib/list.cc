@@ -143,7 +143,7 @@ uint8_t list_contains(list_t *list, void *data, uint8_t(*cmp_fce)(void *x, void 
 }
 
 void *list_get(list_t *list, int32_t index) {
-    if (index < 0 || index >= list->size)
+    if (index < 0 || (uint32_t)index >= list->size)
         return NULL;
     
     list_node_t *curr = list->first;

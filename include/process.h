@@ -21,7 +21,7 @@ typedef struct {
     uint32_t E_FLAGS;
     uint32_t EIP;
     uint32_t CS, SS, ES, DS, FS, GS; //segment registers
-} __attribute__((paced)) regs_t;
+} __attribute__((packed)) regs_t;
 
 typedef struct {
     uint32_t pid;
@@ -45,7 +45,6 @@ void kill_process(PCB_t *pcb);
 PCB_t *get_running_process();
 uint32_t get_kernel_ESP();
 int process_exists(uint32_t addr);
-void copy_process(PCB_t *dest, PCB_t *src);
 
 void keyboard_ask_resource();
 void keyboard_create_resource(char *input);
