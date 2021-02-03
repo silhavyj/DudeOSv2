@@ -93,3 +93,9 @@ _uclear:
     mov     eax, 109
     int     0x80
     ret
+
+[global _ufork]
+_ufork:
+    mov     eax, 110
+    int     0x80
+    ret

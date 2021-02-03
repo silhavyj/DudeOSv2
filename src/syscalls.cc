@@ -5,6 +5,7 @@
 #include <stdlib/stdint.h>
 #include <filesystem.h>
 #include <paging.h>
+#include <support.h>
 
 void handle_systemcall(int_registers_t *regs) {
     switch (regs->eax) {
@@ -39,6 +40,9 @@ void handle_systemcall(int_registers_t *regs) {
             break;
         case SYSCALL_CLEAR:
             syscall_clear_screen();
+            break;
+        case SYSCALL_FORK:
+            syscall_fork();
             break;
         default:
             kprintf("@---KERNEL--- unknown syscall\n");
@@ -109,4 +113,18 @@ void syscall_clear_screen() {
     PCB_t *pcb = get_running_process();
     clear_screen();
     set_process_to_run_next(pcb);
+}
+
+void syscall_fork() {
+    PCB_t *pcb = get_running_process();
+    PCB_t *child = create_process(pcb->name);
+    
+    _disable_paging();
+    copy_process(child, pcb);
+    pcb->registers.EAX = 1;
+    child->registers.EAX = 0;
+    _enable_paging();
+
+    set_process_to_run_next(pcb);
+    set_process_to_run_next(child);
 }

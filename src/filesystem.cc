@@ -7,13 +7,15 @@
 #include <user-programs/exe/error.bin.h>
 #include <user-programs/exe/test_malloc.bin.h>
 #include <user-programs/exe/calc.bin.h>
+#include <user-programs/exe/test_fork.bin.h>
 
 const file_t files[] {
     { "idle.exe",  sizeof(exe_idle_bin),  exe_idle_bin  },
     { "shell.exe", sizeof(exe_shell_bin), exe_shell_bin },
     { "error.exe", sizeof(exe_error_bin), exe_error_bin },
     { "test_malloc.exe", sizeof(exe_test_malloc_bin), exe_test_malloc_bin },
-    { "calc.exe", sizeof(exe_calc_bin), exe_calc_bin }
+    { "calc.exe", sizeof(exe_calc_bin), exe_calc_bin },
+    { "test_fork.exe", sizeof(exe_test_fork_bin), exe_test_fork_bin }
 };
 
 uint32_t files_count = 0;

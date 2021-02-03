@@ -136,6 +136,30 @@ void set_process_to_run_next(PCB_t *pcb) {
     list_add_first(ready_processes, pcb);
 }
 
+void copy_process(PCB_t *dest, PCB_t *src) {
+    //memcpy((char *)src->pages[PROCESS_MAX_MEMORY_PAGES - 2], (char *)src->pages[PROCESS_MAX_MEMORY_PAGES - 2]);
+    int i;
+    for (i = 0; i < FRAME_SIZE; i++)
+        *(char *)(dest->pages[PROCESS_MAX_MEMORY_PAGES - 2] + i) =  *(char *)(src->pages[PROCESS_MAX_MEMORY_PAGES - 2] + i);
+
+    dest->registers.EAX = src->registers.EAX;
+    dest->registers.EBX = src->registers.EBX;
+    dest->registers.ECX = src->registers.ECX;
+    dest->registers.EDX = src->registers.EDX;
+    dest->registers.ESP = src->registers.ESP;
+    dest->registers.EBP = src->registers.EBP;
+    dest->registers.ESI = src->registers.ESI;
+    dest->registers.EDI = src->registers.EDI;
+    dest->registers.E_FLAGS = src->registers.E_FLAGS;
+    dest->registers.EIP = src->registers.EIP;
+    dest->registers.CS = src->registers.CS;
+    dest->registers.SS = src->registers.SS;
+    dest->registers.DS = src->registers.DS;
+    dest->registers.ES = src->registers.ES;
+    dest->registers.FS = src->registers.FS;
+    dest->registers.GS = src->registers.GS;
+}
+
 PCB_t *create_process(const char *process_name) {
     int i;
     int program_page_count = 0;
