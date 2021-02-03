@@ -15,9 +15,6 @@ void init(void (*init_fce)(), const char *msg);
 
 extern "C" int _kmain() {
     clear_screen();
-
-    //kprintf("HEY\n");
-
     print_os_logo();
 
     init(&init_gdt,               "initializing GDT...");

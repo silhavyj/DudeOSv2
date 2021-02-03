@@ -113,6 +113,11 @@ void switch_process() {
         running_process = (PCB_t *)ready_processes->first->data;
         list_remove(ready_processes, 0, NULL);
     }
+    if (strcmp(running_process->name, "shell.exe") == 0 && waiting_keyboard_processes->size > 0) {
+        set_process_to_run_next(running_process);
+        running_process = idle_process;
+    }
+
     #ifdef SCHEDULER_DEBUG
         set_color(FOREGROUND_YELLOW);
         kprintf("scheduled: pid=%x name=%s\n", running_process->pid, running_process->name);

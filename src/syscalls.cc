@@ -92,7 +92,7 @@ void syscall_exec_program() {
 // terminates process that's pcb is in EBX
 void syscall_terminate_process() {
     PCB_t *pcb = get_running_process();
-    set_process_as_ready(pcb);
+    set_process_to_run_next(pcb);
     if (process_exists(pcb->registers.EBX) != 1)
         pcb->registers.EAX = 1;
     else {

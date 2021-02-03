@@ -6,7 +6,7 @@ CXXFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector  \
 LD       = ld
 LDFLAGS  = --Ttext 0x0 --oformat binary -m elf_i386
 
-programs     = exe/idle exe/shell exe/error exe/test_malloc
+programs     = exe/idle exe/shell exe/error exe/test_malloc exe/calc
 header_files = $(programs:=.bin.h)
 bin_files    = $(programs:=.bin)
 
