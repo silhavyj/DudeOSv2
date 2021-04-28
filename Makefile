@@ -46,6 +46,14 @@ install-dependencies:
 run: user_programs $(OS_IMAGE)
 	qemu-system-i386 $(OS_IMAGE)
 
+.PHONE build-docker-image:
+build-docker-image:
+	docker build -t dudeosv2 .	
+
+.PHONE docker-build:
+docker-build:
+	docker run --rm -v $$PWD:/root/dudeosv2 dudeosv2
+
 .PHONY clean:
 clean:
 	make -C include/user-programs clean
