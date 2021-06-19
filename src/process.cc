@@ -2,7 +2,7 @@
 #include <heap.h>
 #include <stdlib/list.h>
 #include <stdlib/string.h>
-#include <filesystem.h>
+#include <app.h>
 #include <paging.h>
 #include <drivers/screen.h>
 #include <stdlib/memory.h>
@@ -68,7 +68,7 @@ void init_process_scheduler() {
 
 uint32_t load_process(uint32_t *pages, const char *process_name) {
     uint32_t i, j;
-    const file_t *program;
+    const program_t *program;
     uint32_t page_count;
     char *program_txt;
 
@@ -76,7 +76,7 @@ uint32_t load_process(uint32_t *pages, const char *process_name) {
     uint32_t bytes_copied = 0;
 
     // get the file (program)
-    program = get_file(process_name);
+    program = get_program(process_name);
     if (program == NULL)
         return 0;
     
@@ -154,6 +154,8 @@ PCB_t *create_process(const char *process_name) {
     program_page_count = load_process(pcb->pages, pcb->name);
     if (program_page_count == 0)
         return 0;   // something went wrong
+
+    pcb->program_page_count = program_page_count;
 
     // initialize process stack (1 FRAME = 4kB)
     pcb->pages[PROCESS_MAX_MEMORY_PAGES - 2] = frame_address(frame_alloc());

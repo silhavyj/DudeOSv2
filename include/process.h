@@ -28,6 +28,7 @@ typedef struct {
     uint8_t state;
     char name[PROCESS_NAME_LEN];
     regs_t registers;
+    uint32_t program_page_count;
     uint32_t pages[PROCESS_MAX_MEMORY_PAGES];
     heap_t heap;
 } PCB_t;

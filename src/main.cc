@@ -4,7 +4,7 @@
 #include <support.h>
 #include <paging.h>
 #include <heap.h>
-#include <filesystem.h>
+#include <app.h>
 #include <stdlib/string.h>
 #include <drivers/screen.h>
 #include <drivers/keyboard.h>
@@ -24,11 +24,15 @@ extern "C" int _kmain() {
     init(&init_keyboard,          "initializing keyboard...");
     init(&init_paging,            "initializing paging...");
     init(&init_kernel_heap,       "initializing kernel heap...");
-    init(&init_filesystem,        "initializing filesystem...");
+    init(&init_programs_list,     "initializing programs...");
     init(&init_process_scheduler, "initializing process scheduler...");
     init(NULL,                    "starting shell...");
 
     kprintf("\n");
+
+    /*void *disk = kmalloc(1440*1024);
+    if (disk == NULL)
+        kprintf(":(\n");*/
 
     PCB_t *shell = create_process("shell.exe");
     set_process_as_ready(shell);

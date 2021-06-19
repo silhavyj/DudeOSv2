@@ -2,10 +2,10 @@
 #include <stdlib/string.h>
 
 #define HELP          "help"
-#define EXEC          "exec"
+#define EXEC          "./"
 #define PS            "ps"
 #define KILL          "kill"
-#define SHOW_PROGRAMS "show programs"
+#define SHOW_PROGRAMS "lsp"
 #define CLEAR         "clear"
 
 void print_help();
@@ -20,7 +20,7 @@ int main() {
         if (strcmp(line, HELP, strlen(HELP)) == 0)
             print_help();
         else if (strcmp(line, EXEC, strlen(EXEC)) == 0) {
-            if (_uexec(line + strlen(EXEC) + 1) == 0)
+            if (_uexec(line + strlen(EXEC)) == 0)
                 _uprintf("program not found!\n");
         }
         else if (strcmp(line, PS, strlen(PS)) == 0)
@@ -45,8 +45,8 @@ int main() {
 
 void print_help() {
     _uprintf("help           - prints out this text\n");
-    _uprintf("exec <program> - executes the program\n");
-    _uprintf("show programs  - prints out all programs available\n");
+    _uprintf("./<program>    - executes the program\n");
+    _uprintf("lsp            - prints out all programs available\n");
     _uprintf("kill <pid>     - kills the process\n");
     _uprintf("ps             - prints out all processes\n");
     _uprintf("clear          - clears the screen\n");

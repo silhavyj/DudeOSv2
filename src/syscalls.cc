@@ -3,7 +3,7 @@
 #include <process.h>
 #include <drivers/screen.h>
 #include <stdlib/stdint.h>
-#include <filesystem.h>
+#include <app.h>
 #include <paging.h>
 #include <support.h>
 #include <stdlib/memory.h>
@@ -36,7 +36,7 @@ void handle_systemcall(int_registers_t *regs) {
             set_process_as_ready(get_running_process());
             break;
         case SYSCALL_PRINT_ALL_PROGRAMS:
-            list_all_files();
+            list_all_programs();
             set_process_as_ready(get_running_process());
             break;
         case SYSCALL_CLEAR:
@@ -127,6 +127,10 @@ void syscall_fork() {
    
     // copy the content of the stack
     memcpy((char *)child->pages[PROCESS_MAX_MEMORY_PAGES - 2], (char *)pcb->pages[PROCESS_MAX_MEMORY_PAGES - 2], FRAME_SIZE);
+
+    // copy the content of the heap
+    memcpy((char *)child->pages[pcb->program_page_count], (char *)pcb->pages[pcb->program_page_count], (PROCESS_MAX_MEMORY_PAGES - 3 - pcb->program_page_count) * FRAME_SIZE);
+    child->heap = pcb->heap;
 
     // copy the content of the registers
     memcpy((char *)&child->registers, (char *)&pcb->registers, sizeof(regs_t));

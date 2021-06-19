@@ -60,9 +60,10 @@ void process_key(uint8_t scan_code) {
     char symbol = convert_scan_code(scan_code, &pressed);
 
     if (symbol == KEY_CODE_BACK_SPACE) {
-        print_backspace();
-        if (keyboard_buff_pos > 0)
+        if (keyboard_buff_pos > 0) {
+            print_backspace();
             keyboard_buff_pos--;
+        }
     } else if (symbol == ENTER_KEY_CODE) {
         // TODO wake up a process waiting for a keyboard interrupt
         kprintf("\n");

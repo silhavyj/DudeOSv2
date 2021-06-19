@@ -43,7 +43,7 @@ install-dependencies:
 	sudo apt-get install qemu-system-i386
 
 .PHONY run:
-run: user_programs $(OS_IMAGE)
+run: docker-build user_programs $(OS_IMAGE)
 	qemu-system-i386 $(OS_IMAGE)
 
 .PHONE build-docker-image:
