@@ -2,7 +2,6 @@
 #define _IPC_H_
 
 #include <stdlib/stdint.h>
-#include <stdlib/list.h>
 
 #define IPC_BUFF_SIZE 32
 
@@ -12,7 +11,7 @@ typedef struct {
     char buff[IPC_BUFF_SIZE];
 } ipc_msg_t;
 
-void init_msg_queue();
+void init_ipc_msg_queue();
 void insert_msg(ipc_msg_t msg);
 
 #endif
