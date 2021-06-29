@@ -9,6 +9,7 @@
 #include <drivers/screen.h>
 #include <drivers/keyboard.h>
 #include <process.h>
+#include <ipc.h>
 
 void print_os_logo();
 void init(void (*init_fce)(), const char *msg);
@@ -26,6 +27,7 @@ extern "C" int _kmain() {
     init(&init_kernel_heap,       "initializing kernel heap...");
     init(&init_programs_list,     "initializing programs...");
     init(&init_process_scheduler, "initializing process scheduler...");
+    init(&init_ipc,               "initializing IPC...");
     init(NULL,                    "starting shell...");
 
     kprintf("\n");
