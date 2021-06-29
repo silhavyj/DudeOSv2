@@ -19,13 +19,24 @@ pipe_t *get_pipe(uint32_t id) {
     return NULL;
 }
 
-int create_pipe(uint32_t id) {
-    if (get_pipe(id) != NULL)
-        return PIPE_FAILURE;
+int create_pipe(uint32_t id, PCB_t *pcb) {
+    pipe_t *pipe = get_pipe(id);
+    if (pipe != NULL) {
+        if (pipe->pcb2 != NULL)
+            return PIPE_FAILURE;
+            
+        pipe->pcb2 = pcb;
+        return PIPE_SUCCESS;
+    }
 
-    pipe_t *pipe = (pipe_t *)kmalloc(sizeof(pipe_t));
+    pipe = (pipe_t *)kmalloc(sizeof(pipe_t));
     if (pipe == NULL)
         return PIPE_FAILURE;
+
+    pipe->pcb1 = pcb;
+    pipe->id = id;
+    pipe->buff_size = 0;
+    pipe->pcb2 = NULL;
 
     list_add_last(pipe_queue, (void *)pipe);
     return PIPE_SUCCESS;
