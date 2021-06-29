@@ -99,3 +99,10 @@ _ufork:
     mov     eax, 110
     int     0x80
     ret
+
+[global _upipe]
+_upipe:
+    mov     ebx, [esp + 4]
+    mov     eax, 111
+    int     0x80
+    ret

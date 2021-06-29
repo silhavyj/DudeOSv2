@@ -7,6 +7,7 @@
 #include <paging.h>
 #include <support.h>
 #include <stdlib/memory.h>
+#include <ipc.h>
 
 void handle_systemcall(int_registers_t *regs) {
     switch (regs->eax) {
@@ -44,6 +45,9 @@ void handle_systemcall(int_registers_t *regs) {
             break;
         case SYSCALL_FORK:
             syscall_fork();
+            break;
+        case SYSCALL_PIPE:
+            syscall_pipe();
             break;
         default:
             kprintf("@---KERNEL--- unknown syscall\n");
@@ -143,4 +147,10 @@ void syscall_fork() {
 
     set_process_to_run_next(pcb);
     set_process_to_run_next(child);
+}
+
+void syscall_pipe() {
+    PCB_t *pcb = get_running_process();
+    pcb->registers.EAX = create_pipe(pcb->registers.EBX, pcb);
+    set_process_to_run_next(pcb);
 }

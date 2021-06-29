@@ -17,6 +17,7 @@ extern "C" {
     int _ukill(unsigned int pid);
     int _ufork();
     void _uclear();
+    int _upipe(unsigned int id);
 }
 
 #endif

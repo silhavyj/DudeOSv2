@@ -14,6 +14,7 @@
 #define SYSCALL_PRINT_ALL_PROGRAMS 108
 #define SYSCALL_CLEAR              109
 #define SYSCALL_FORK               110
+#define SYSCALL_PIPE               111
 
 void handle_systemcall(int_registers_t *regs);
 void syscall_exit();
@@ -25,5 +26,6 @@ void syscall_exec_program();
 void syscall_terminate_process();
 void syscall_clear_screen();
 void syscall_fork();
+void syscall_pipe();
 
 #endif
