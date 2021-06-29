@@ -4,7 +4,7 @@
 #define BUFF_LEN 32
 
 int main() {
-    _uprintf("test pipe!!\n");
+    /*_uprintf("test pipe!!\n");
     
     char *buff = (char *)_umalloc(BUFF_LEN);
     char *buff2 = (char *)_umalloc(BUFF_LEN);
@@ -28,7 +28,12 @@ int main() {
 
         _ufree(buff);
         _ufree(buff2);
-    }
+    }*/
+
+    _upipe(1);
+    _uprintf("test pipe!!\n");
+    _upipe_release(2);
+    _uprintf("test pipe!!\n");
     _uexit();
 }
 

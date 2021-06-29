@@ -148,8 +148,8 @@ void syscall_fork() {
     // copy the content of the registers
     memcpy((char *)&child->registers, (char *)&pcb->registers, sizeof(regs_t));
 
-    pcb->registers.EAX = 1;     // you're the parent
-    child->registers.EAX = 0;   // you're the child
+    pcb->registers.EAX = 1;   // you're the parent
+    child->registers.EAX = 0; // you're the child
 
     // once we're done - enable paging again
     _enable_paging();
@@ -166,18 +166,51 @@ void syscall_pipe() {
 
 void syscall_pipe_write() {
     PCB_t *pcb = get_running_process();
-    pcb->registers.EAX = pipe_write(pcb->registers.EBX, (char *)pcb->registers.ECX, pcb->registers.EDX, pcb);
-    set_process_to_run_next(pcb);
+    int pipe_id = pcb->registers.EBX;
+    int pipe_state = verify_pipe_access(pipe_id, pcb);
+    if (pipe_state != PIPE_SUCCESS) {
+        syscall_exit(); // kill the process if it's trying to access someone else's pipe 
+        switch_process();
+        return;
+    } else {
+        if (is_pipe_empty(pipe_id, pcb) || is_pipe_locked(pipe_id, pcb)) {
+            //TODO: ?set_process_as_ready(pcb);
+            switch_process();
+        } else {
+            pcb->registers.EAX = pipe_write(pcb->registers.EBX, (char *)pcb->registers.ECX, pcb->registers.EDX, pcb);
+            set_process_to_run_next(pcb);
+        }
+    }
+
 }
 
 void syscall_pipe_read() {
     PCB_t *pcb = get_running_process();
-    pcb->registers.EAX = pipe_read(pcb->registers.EBX, (char *)pcb->registers.ECX, pcb->registers.EDX, pcb);
-    set_process_to_run_next(pcb);
+    int pipe_id = pcb->registers.EBX;
+    int pipe_state = verify_pipe_access(pipe_id, pcb);
+    if (pipe_state != PIPE_SUCCESS) {
+        syscall_exit(); // kill the process if it's trying to access someone else's pipe 
+        switch_process();
+        return;
+    } else {
+        if (is_pipe_empty(pipe_id, pcb) || is_pipe_locked(pipe_id, pcb)) {
+            //TODO: ?set_process_as_ready(pcb);
+            switch_process();
+        } else {
+            pcb->registers.EAX = pipe_read(pipe_id, (char *)pcb->registers.ECX, pcb->registers.EDX, pcb);
+            set_process_to_run_next(pcb);
+        }
+    }
 }
 
 void syscall_pipe_release() {
     PCB_t *pcb = get_running_process();
+    int pipe_id = pcb->registers.EBX;
+    if (verify_pipe_access(pipe_id, pcb) != PIPE_SUCCESS || get_pipe_holder(pipe_id) != pcb) {
+        syscall_exit(); // kill the process if it's trying to access someone else's pipe 
+        switch_process();
+        return;
+    }
     pcb->registers.EAX = pipe_release(pcb->registers.EBX, pcb);
     set_process_to_run_next(pcb);
 }

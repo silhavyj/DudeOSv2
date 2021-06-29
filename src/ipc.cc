@@ -6,6 +6,7 @@
 #include <drivers/screen.h>
 
 list_t *pipe_queue = NULL;
+int last_operation = -1;
 
 void init_ipc() {
     pipe_queue = list_create();
@@ -40,6 +41,7 @@ int create_pipe(uint32_t id, PCB_t *pcb) {
     pipe->id = id;
     pipe->buff_index = 0;
     pipe->locked = 0;
+    pipe->empty = 1;
     pipe->pcb2 = NULL;
 
     list_add_last(pipe_queue, (void *)pipe);
@@ -73,11 +75,15 @@ int perform_operation(uint32_t pipe_id, char *buffer, uint32_t bytes, uint8_t re
         return PIPE_UNAUTHORIZED_ACCESS;
 
     pipe->locked = 1;
+    pipe->current_owner = pcb;
 
     uint32_t max_bytes_to_cpy = get_max_bytes_to_process(bytes, pipe);
     if (read == 1) {
+        last_operation = PIPE_READING;
         memcpy(buffer, pipe->buff + pipe->buff_index, max_bytes_to_cpy);
     } else if (read == 0) {
+        pipe->empty = 0;
+        last_operation = PIPE_WRITING;
         memcpy(pipe->buff + pipe->buff_index, buffer, max_bytes_to_cpy);
     } else {
         return PIPE_BUFF_FAILURE;
@@ -90,11 +96,11 @@ int perform_operation(uint32_t pipe_id, char *buffer, uint32_t bytes, uint8_t re
 }
 
 int pipe_read(uint32_t pipe_id, char *buffer, uint32_t bytes, PCB_t *pcb) {
-    return perform_operation(pipe_id, buffer, bytes, 1, pcb);
+    return perform_operation(pipe_id, buffer, bytes, PIPE_READING, pcb);
 }
 
 int pipe_write(uint32_t pipe_id, char *buffer, uint32_t bytes, PCB_t *pcb) {
-    return perform_operation(pipe_id, buffer, bytes, 0, pcb);
+    return perform_operation(pipe_id, buffer, bytes, PIPE_WRITING, pcb);
 }
 
 int pipe_release(uint32_t id, PCB_t *pcb) {
@@ -106,5 +112,43 @@ int pipe_release(uint32_t id, PCB_t *pcb) {
 
     pipe->locked = 0;
     pipe->buff_index = 0; // so the reader/writer can start from the beginning
+    pipe->current_owner = NULL;
+
+    if (last_operation == PIPE_READING)
+        pipe->empty = 1;
     return PIPE_SUCCESS;
+}
+
+int is_pipe_empty(uint32_t id, PCB_t *pcb) {
+    pipe_t *pipe = get_pipe(id);
+    if (pipe == NULL)
+        return PIPE_FAILURE;
+    if (pipe->pcb1 != pcb && pipe->pcb2 != pcb)
+        return PIPE_UNAUTHORIZED_ACCESS;
+    return pipe->empty;
+}
+
+int is_pipe_locked(uint32_t id, PCB_t *pcb) {
+    pipe_t *pipe = get_pipe(id);
+    if (pipe == NULL)
+        return PIPE_FAILURE;
+    if (pipe->pcb1 != pcb && pipe->pcb2 != pcb)
+        return PIPE_UNAUTHORIZED_ACCESS;
+    return pipe->locked;
+}
+
+int verify_pipe_access(uint32_t id, PCB_t *pcb) {
+    pipe_t *pipe = get_pipe(id);
+    if (pipe == NULL)
+        return PIPE_FAILURE;
+    if (pipe->pcb1 != pcb && pipe->pcb2 != pcb)
+        return PIPE_UNAUTHORIZED_ACCESS;
+    return PIPE_SUCCESS;
+}
+
+PCB_t *get_pipe_holder(uint32_t id) {
+    pipe_t *pipe = get_pipe(id);
+    if (pipe == NULL)
+        return NULL;
+    return pipe->current_owner;
 }
