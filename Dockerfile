@@ -9,4 +9,4 @@ RUN \
 	rm -rf /var/lib/apt/lists 
 
 WORKDIR /root/dudeosv2
-CMD make
+CMD make build-os
