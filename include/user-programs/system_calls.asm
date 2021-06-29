@@ -106,3 +106,28 @@ _upipe:
     mov     eax, 111
     int     0x80
     ret
+
+[global _upipe_write]
+_upipe_write:
+    mov     ebx, [esp + 4]
+    mov     ecx, [esp + 8]
+    mov     edx, [esp + 12]
+    mov     eax, 112
+    int     0x80
+    ret
+
+[global _upipe_read]
+_upipe_read:
+    mov     ebx, [esp + 4]
+    mov     ecx, [esp + 8]
+    mov     edx, [esp + 12]
+    mov     eax, 113
+    int     0x80
+    ret
+
+[global _upipe_release]
+_upipe_release:
+    mov     ebx, [esp + 4]
+    mov     eax, 114
+    int     0x80
+    ret

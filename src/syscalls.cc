@@ -49,6 +49,15 @@ void handle_systemcall(int_registers_t *regs) {
         case SYSCALL_PIPE:
             syscall_pipe();
             break;
+        case SYSCALL_PIPE_WRITE:
+            syscall_pipe_write();
+            break;
+        case SYSCALL_PIPE_READ:
+            syscall_pipe_read();
+            break;
+        case SYSCALL_PIPE_RELEASE:
+            syscall_pipe_release();
+            break;
         default:
             kprintf("@---KERNEL--- unknown syscall\n");
             break;
@@ -152,5 +161,23 @@ void syscall_fork() {
 void syscall_pipe() {
     PCB_t *pcb = get_running_process();
     pcb->registers.EAX = create_pipe(pcb->registers.EBX, pcb);
+    set_process_to_run_next(pcb);
+}
+
+void syscall_pipe_write() {
+    PCB_t *pcb = get_running_process();
+    pcb->registers.EAX = pipe_write(pcb->registers.EBX, (char *)pcb->registers.ECX, pcb->registers.EDX, pcb);
+    set_process_to_run_next(pcb);
+}
+
+void syscall_pipe_read() {
+    PCB_t *pcb = get_running_process();
+    pcb->registers.EAX = pipe_read(pcb->registers.EBX, (char *)pcb->registers.ECX, pcb->registers.EDX, pcb);
+    set_process_to_run_next(pcb);
+}
+
+void syscall_pipe_release() {
+    PCB_t *pcb = get_running_process();
+    pcb->registers.EAX = pipe_release(pcb->registers.EBX, pcb);
     set_process_to_run_next(pcb);
 }

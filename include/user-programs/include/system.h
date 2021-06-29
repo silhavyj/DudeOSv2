@@ -18,6 +18,9 @@ extern "C" {
     int _ufork();
     void _uclear();
     int _upipe(unsigned int id);
+    int _upipe_write(unsigned int id, char *buffer, unsigned int bytes);
+    int _upipe_read(unsigned int id, char *buffer, unsigned int bytes);
+    int _upipe_release(unsigned int id);
 }
 
 #endif
