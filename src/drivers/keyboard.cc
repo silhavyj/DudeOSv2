@@ -13,6 +13,11 @@ uint8_t ctrl_on     = 0;
 uint8_t alt_on      = 0;
 uint8_t capslock_on = 0;
 
+void abort_current_cmd() {
+    kprintf("^C\n");
+    keyboard_buff_pos = 0;
+}
+
 unsigned char convert_scan_code(uint8_t scan_code, uint8_t *pressed) {
     int original_scancode = scan_code & 0x7F;
     *pressed = (scan_code & 0x80) ? 1 : 0;

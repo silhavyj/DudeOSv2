@@ -58,6 +58,7 @@ build-docker-image:
 build-os: user_programs $(OS_IMAGE)
 
 # builds the OS image off of the object files
+# 1474560 = 1.4MB
 $(OS_IMAGE) : $(OBJ_FILES)
 	$(LD) $(LD_FLAGS) $(OBJ_FILES) -o $(OS_BIN)
 	make -C boot

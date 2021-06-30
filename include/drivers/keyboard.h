@@ -19,8 +19,15 @@
 #define KEY_CODE_DOWN_ARROW  80
 #define ENTER_KEY_CODE       28
 
+#define MAX_CMD_HISTORY_RECORDS 10
+
+typedef struct {
+    char buffer[KEYBOARD_BUFF_SIZE];
+} cmd_history_record_t;
+
 void init_keyboard();
 void process_key(uint8_t scan_code); 
 unsigned char convert_scan_code(uint8_t scan_code, uint8_t *pressed);
+void abort_current_cmd();
 
 #endif

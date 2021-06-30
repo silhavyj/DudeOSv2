@@ -1,7 +1,11 @@
+#include <drivers/screen.h>
+#include <stdlib/stdint.h>
+#include <drivers/keyboard.h>
 #include <drivers/ctrl_keyboard_shorcuts.h>
 
 crl_keyboard_shortcut_t ctr_keyboard_shortcuts[] = {
-    {'l', &clear_screen }
+    {'l', &clear_screen },
+    {'c', &abort_current_cmd}
 };
 
 int ctr_shortcuts_count = sizeof(ctr_keyboard_shortcuts) / sizeof(crl_keyboard_shortcut_t);
