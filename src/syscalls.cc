@@ -173,15 +173,16 @@ void syscall_pipe_write() {
         switch_process();
         return;
     } else {
-        if (is_pipe_empty(pipe_id, pcb) || is_pipe_locked(pipe_id, pcb)) {
-            //TODO: ?set_process_as_ready(pcb);
+        if (!is_pipe_empty(pipe_id, pcb) || is_pipe_locked(pipe_id, pcb)) {
+            //pcb->registers.EIP -= 4; // don't skip the calling op - you have to try it again once you have the CPU
+            pcb->registers.EAX = PIPE_BLOCKED;
+            block_process_on_pipe();
             switch_process();
         } else {
             pcb->registers.EAX = pipe_write(pcb->registers.EBX, (char *)pcb->registers.ECX, pcb->registers.EDX, pcb);
             set_process_to_run_next(pcb);
         }
     }
-
 }
 
 void syscall_pipe_read() {
@@ -194,7 +195,9 @@ void syscall_pipe_read() {
         return;
     } else {
         if (is_pipe_empty(pipe_id, pcb) || is_pipe_locked(pipe_id, pcb)) {
-            //TODO: ?set_process_as_ready(pcb);
+            //pcb->registers.EIP -= 4; // don't skip the calling op - you have to try it again once you have the CPU
+            pcb->registers.EAX = PIPE_BLOCKED;
+            block_process_on_pipe();
             switch_process();
         } else {
             pcb->registers.EAX = pipe_read(pipe_id, (char *)pcb->registers.ECX, pcb->registers.EDX, pcb);

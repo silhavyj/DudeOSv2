@@ -1,45 +1,41 @@
 #include <system.h>
+#include <stdlib/string.h>
 #include <stdlib/memory.h>
 
 #define BUFF_LEN 32
+#define N 10
+#define PIPE_ID 135
 
 int main() {
-    /*_uprintf("test pipe!!\n");
-    
-    char *buff = (char *)_umalloc(BUFF_LEN);
-    char *buff2 = (char *)_umalloc(BUFF_LEN);
-    _ureadln(buff);
+    int i;
+    if (_ufork() == 0) {
+        char *buff_sender = (char *)_umalloc(BUFF_LEN);
+        _upipe(PIPE_ID);
 
-    int id = 1;
-    if (_upipe(id) == -1) {
-        _uprintf("Err while creating a pipe\n");
-         _uexit();
-    } else {
-        if (_upipe(id) == -1) {
-            _uprintf("Err while creating a pipe\n");
-            _uexit();
+        for (i = 0; i < N; i++) {
+            memset(buff_sender, 0, BUFF_LEN);
+            int_to_str(buff_sender, i+1, 10);
+            while (_upipe_write(PIPE_ID, buff_sender, strlen(buff_sender)) == 6);
+            _uprintf("sent number: %d\n", i+1);
+           // _uprintf("sender - releasing pipe\n");
+            _upipe_release(PIPE_ID);
         }
-        _uprintf("%s %s\n", buff, buff2);
-        _upipe_write(1, buff, 32);
-        _upipe_release(1);
-        _upipe_read(1, buff2, 32);
-        _uprintf("buff: %s\n", buff);
-        _uprintf("buff2: %s\n", buff2);
+        _ufree(buff_sender);
+    } else {
+        int x;
+        char *buff_receiver = (char *)_umalloc(BUFF_LEN);
+        _upipe(PIPE_ID);
 
-        _ufree(buff);
-        _ufree(buff2);
-    }*/
-
-    _upipe(1);
-    _uprintf("test pipe!!\n");
-    _upipe_release(2);
-    _uprintf("test pipe!!\n");
-    _uexit();
-}
-
-void print_str(char *str) {
-    while (*str != '\0') {
-        _uprintf("%c", *str);
-        str++;
+        for (i = 0; i < N; i++) {
+            memset(buff_receiver, 0, BUFF_LEN);
+           // _uprintf("receiver - reading from pipe\n");
+            while (_upipe_read(PIPE_ID, buff_receiver, BUFF_LEN-1) == 6);
+            x = atoi(buff_receiver);
+            _uprintf("received number: %d\n", x);
+            _upipe_release(PIPE_ID);
+           // _uprintf("receiver - releasing pipe\n");
+        }
+        _ufree(buff_receiver);
     }
+    _uexit();
 }

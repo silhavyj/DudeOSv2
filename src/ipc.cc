@@ -43,6 +43,7 @@ int create_pipe(uint32_t id, PCB_t *pcb) {
     pipe->locked = 0;
     pipe->empty = 1;
     pipe->pcb2 = NULL;
+    pipe->current_owner = NULL;
 
     list_add_last(pipe_queue, (void *)pipe);
     return PIPE_SUCCESS;
@@ -62,7 +63,7 @@ int delete_pipe(uint32_t id) {
 
 uint32_t get_max_bytes_to_process(uint32_t bytes, pipe_t *pipe) {
     if (pipe->buff_index + bytes >= PIPE_MAX_BUFF_SIZE) 
-        return pipe->buff_index + bytes - PIPE_MAX_BUFF_SIZE;
+        return PIPE_MAX_BUFF_SIZE - pipe->buff_index + 1;
     return bytes;
 }
 
@@ -74,8 +75,10 @@ int perform_operation(uint32_t pipe_id, char *buffer, uint32_t bytes, uint8_t re
     if (pipe->pcb1 != pcb && pipe->pcb2 != pcb)
         return PIPE_UNAUTHORIZED_ACCESS;
 
-    pipe->locked = 1;
-    pipe->current_owner = pcb;
+    if (pipe->locked == 0) {
+        pipe->locked = 1;
+        pipe->current_owner = pcb;
+    }
 
     uint32_t max_bytes_to_cpy = get_max_bytes_to_process(bytes, pipe);
     if (read == 1) {
@@ -109,10 +112,11 @@ int pipe_release(uint32_t id, PCB_t *pcb) {
         return PIPE_FAILURE;
     if (pipe->pcb1 != pcb && pipe->pcb2 != pcb)
         return PIPE_UNAUTHORIZED_ACCESS;
+    
+    wake_process_on_pipe(pipe->current_owner == pipe->pcb1 ? pipe->pcb2 : pipe->pcb1);
 
     pipe->locked = 0;
     pipe->buff_index = 0; // so the reader/writer can start from the beginning
-    pipe->current_owner = NULL;
 
     if (last_operation == PIPE_READING)
         pipe->empty = 1;
@@ -151,4 +155,12 @@ PCB_t *get_pipe_holder(uint32_t id) {
     if (pipe == NULL)
         return NULL;
     return pipe->current_owner;
+}
+
+int delete_all_pipes_with_pcb(PCB_t *pcb) {
+    if (pcb == NULL)
+        return PIPE_FAILURE;
+    // TODO iterate through the list and
+    //      remove all pipes associated with pcb
+    return PIPE_SUCCESS;
 }
