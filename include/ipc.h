@@ -36,5 +36,6 @@ int is_pipe_locked(uint32_t id, PCB_t *pcb);
 int verify_pipe_access(uint32_t id, PCB_t *pcb);
 PCB_t *get_pipe_holder(uint32_t id);
 int delete_pcb_from_all_pipes(PCB_t *pcb);
+int remove_pcb_from_pipe(uint32_t id, PCB_t *pcb);
 
 #endif

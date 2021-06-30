@@ -18,7 +18,8 @@ int main() {
 
         for (i = 0; i < N; i++) {
             memset(buffer, 0, BUFF_LEN);
-            int_to_str(buffer, i+1, 10);
+            x = i+1;
+            int_to_str(buffer, x, 10);
             _upipe_write(PIPE1_ID, buffer, strlen(buffer));
             _uprintf("(A) sent number (x): %d\n", i+1);
             _upipe_release(PIPE1_ID);
@@ -46,7 +47,6 @@ int main() {
             int_to_str(buffer, x, 10);
             _upipe_write(PIPE2_ID, buffer, strlen(buffer));
             _uprintf("(B) sent number (2*x): %d\n", x);
-             if (i < N-1)
             _upipe_release(PIPE2_ID);
         }
     }

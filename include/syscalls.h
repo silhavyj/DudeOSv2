@@ -18,6 +18,7 @@
 #define SYSCALL_PIPE_WRITE         112
 #define SYSCALL_PIPE_READ          113
 #define SYSCALL_PIPE_RELEASE       114
+#define SYSCALL_PIPE_CLOSE         115
 
 void handle_systemcall(int_registers_t *regs);
 void syscall_exit();
@@ -33,5 +34,6 @@ void syscall_pipe();
 void syscall_pipe_write();
 void syscall_pipe_read();
 void syscall_pipe_release();
+void syscall_pipe_close();
 
 #endif

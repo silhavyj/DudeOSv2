@@ -61,6 +61,23 @@ static int delete_pipe(uint32_t id) {
     return PIPE_SUCCESS;
 }
 
+int remove_pcb_from_pipe(uint32_t id, PCB_t *pcb) {
+    pipe_t *pipe = get_pipe(id);
+    if (pipe == NULL)
+        return PIPE_FAILURE;
+    if (pcb == pipe->pcb1) {
+        pipe->pcb1 = NULL;
+        if (pipe->pcb2 == NULL)
+            return delete_pipe(id);
+    } 
+    if (pcb == pipe->pcb2) {
+        pipe->pcb2 = NULL;
+        if (pipe->pcb1 == NULL)
+            return delete_pipe(id);
+    }
+    return PIPE_SUCCESS;
+}
+
 uint32_t get_max_bytes_to_process(uint32_t bytes, pipe_t *pipe) {
     if (pipe->buff_index + bytes >= PIPE_MAX_BUFF_SIZE) 
         return PIPE_MAX_BUFF_SIZE - pipe->buff_index + 1;
@@ -161,37 +178,43 @@ PCB_t *get_pipe_holder(uint32_t id) {
     return pipe->current_owner;
 }
 
+static void delete_int(void *data) {
+    kfree(data);
+}
+
 int delete_pcb_from_all_pipes(PCB_t *pcb) {
     if (pcb == NULL)
         return PIPE_FAILURE;
     
     list_node_t *curr = pipe_queue->first;
     list_t *to_del = list_create();
+    uint32_t *pipe_id;
+
     while (curr != NULL) {
         pipe_t *pipe = (pipe_t *)curr->data;
-        if (pipe->pcb1 == pcb) {
+        if (pcb == pipe->pcb1) {
             pipe->pcb1 = NULL;
-
-            // if the other pcb is also NULL,
-            // mark it for deletion 
-            if (pipe->pcb2 == NULL)
-                list_add_last(to_del, curr->data);
-        }
-        if (pipe->pcb2 == pcb) {
-            pipe->pcb1 = NULL;
-
-            // if the other pcb is also NULL,
-            // mark it for deletion 
-            if (pipe->pcb1 == NULL)
-                list_add_last(to_del, curr->data);
+            if (pipe->pcb2 == NULL) {
+                pipe_id = (uint32_t *)kmalloc(sizeof(uint32_t));
+                *pipe_id = pipe->id;
+                list_add_last(to_del, (void *)pipe_id);
+            }
+        } else if (pcb == pipe->pcb2) {
+            pipe->pcb2 = NULL;
+            if (pipe->pcb1 == NULL) {
+                pipe_id = (uint32_t *)kmalloc(sizeof(uint32_t));
+                *pipe_id = pipe->id;
+                list_add_last(to_del, (void *)pipe_id);
+            }
         }
         curr = curr->next;
     }
+
     curr = to_del->first;
     while (curr != NULL) {
-        delete_pipe(((pipe_t *)curr->data)->id);
+        delete_pipe(*(int *)curr->data);
         curr = curr->next;
     }
-    list_free(&to_del, NULL);
-    return PIPE_SUCCESS;
+    list_free(&to_del, &delete_int);
+    return PIPE_SUCCESS;    
 }

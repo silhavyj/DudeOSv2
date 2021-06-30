@@ -135,3 +135,10 @@ _upipe_release:
     mov     eax, 114
     int     0x80
     ret
+
+[global _upipe_close]
+_upipe_close:
+    mov     ebx, [esp + 4]
+    mov     eax, 115
+    int     0x80
+    ret

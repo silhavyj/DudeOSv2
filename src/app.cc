@@ -9,7 +9,10 @@
 //#include <user-programs/exe/calc.bin.h>
 //#include <user-programs/exe/test_fork.bin.h>
 //#include <user-programs/exe/test_fork2.bin.h>
-#include <user-programs/exe/test_pipe.bin.h>
+//#include <user-programs/exe/test_pipe.bin.h>
+#include <user-programs/exe/pipe1.bin.h>
+#include <user-programs/exe/pipe2.bin.h>
+
 
 const program_t programs[] {
     { "idle.exe",  sizeof(exe_idle_bin),  exe_idle_bin  },
@@ -19,7 +22,9 @@ const program_t programs[] {
     //{ "calc.exe", sizeof(exe_calc_bin), exe_calc_bin },
     //{ "test_fork.exe", sizeof(exe_test_fork_bin), exe_test_fork_bin },
     //{ "test_fork2.exe", sizeof(exe_test_fork2_bin), exe_test_fork2_bin },
-    { "test_pipe.exe", sizeof(exe_test_pipe_bin), exe_test_pipe_bin },
+    //{ "test_pipe.exe", sizeof(exe_test_pipe_bin), exe_test_pipe_bin },
+    { "pipe1.exe", sizeof(exe_pipe1_bin), exe_pipe1_bin },
+    { "pipe2.exe", sizeof(exe_pipe2_bin), exe_pipe2_bin }
 };
 
 uint32_t programs_count = 0;
