@@ -114,6 +114,8 @@ _upipe_write:
     mov     edx, [esp + 12]
     mov     eax, 112
     int     0x80
+    cmp     eax, 6
+    je      _upipe_write
     ret
 
 [global _upipe_read]
@@ -123,6 +125,8 @@ _upipe_read:
     mov     edx, [esp + 12]
     mov     eax, 113
     int     0x80
+    cmp     eax, 6
+    je      _upipe_read
     ret
 
 [global _upipe_release]
