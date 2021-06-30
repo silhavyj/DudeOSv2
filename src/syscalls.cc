@@ -67,6 +67,7 @@ void handle_systemcall(int_registers_t *regs) {
 void syscall_exit() {
     PCB_t *pcb = get_running_process();
     kill_process(pcb);
+    delete_pcb_from_all_pipes(pcb);
 }
 
 // prints string which address is in esi
@@ -174,7 +175,6 @@ void syscall_pipe_write() {
         return;
     } else {
         if (!is_pipe_empty(pipe_id, pcb) || is_pipe_locked(pipe_id, pcb)) {
-            //pcb->registers.EIP -= 4; // don't skip the calling op - you have to try it again once you have the CPU
             pcb->registers.EAX = PIPE_BLOCKED;
             block_process_on_pipe();
             switch_process();
@@ -195,7 +195,6 @@ void syscall_pipe_read() {
         return;
     } else {
         if (is_pipe_empty(pipe_id, pcb) || is_pipe_locked(pipe_id, pcb)) {
-            //pcb->registers.EIP -= 4; // don't skip the calling op - you have to try it again once you have the CPU
             pcb->registers.EAX = PIPE_BLOCKED;
             block_process_on_pipe();
             switch_process();

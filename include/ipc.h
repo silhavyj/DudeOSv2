@@ -28,7 +28,6 @@ typedef struct {
 
 void init_ipc();
 int create_pipe(uint32_t id, PCB_t *pcb);
-int delete_pipe(uint32_t id);
 int pipe_read(uint32_t pipe_id, char *buffer, uint32_t bytes, PCB_t *pcb);
 int pipe_write(uint32_t pipe_id, char *buffer, uint32_t bytes, PCB_t *pcb);
 int pipe_release(uint32_t id, PCB_t *pcb);
@@ -36,6 +35,6 @@ int is_pipe_empty(uint32_t id, PCB_t *pcb);
 int is_pipe_locked(uint32_t id, PCB_t *pcb);
 int verify_pipe_access(uint32_t id, PCB_t *pcb);
 PCB_t *get_pipe_holder(uint32_t id);
-int delete_all_pipes_with_pcb(PCB_t *pcb);
+int delete_pcb_from_all_pipes(PCB_t *pcb);
 
 #endif

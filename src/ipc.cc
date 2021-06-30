@@ -53,7 +53,7 @@ void delete_pipe_from_memory(void *data) {
     kfree(data);
 }
 
-int delete_pipe(uint32_t id) {
+static int delete_pipe(uint32_t id) {
     pipe_t *pipe = get_pipe(id);
     if (pipe == NULL)
         return PIPE_FAILURE;
@@ -157,10 +157,37 @@ PCB_t *get_pipe_holder(uint32_t id) {
     return pipe->current_owner;
 }
 
-int delete_all_pipes_with_pcb(PCB_t *pcb) {
+int delete_pcb_from_all_pipes(PCB_t *pcb) {
     if (pcb == NULL)
         return PIPE_FAILURE;
-    // TODO iterate through the list and
-    //      remove all pipes associated with pcb
+    
+    list_node_t *curr = pipe_queue->first;
+    list_t *to_del = list_create();
+    while (curr != NULL) {
+        pipe_t *pipe = (pipe_t *)curr->data;
+        if (pipe->pcb1 == pcb) {
+            pipe->pcb1 = NULL;
+
+            // if the other pcb is also NULL,
+            // mark it for deletion 
+            if (pipe->pcb2 == NULL)
+                list_add_last(to_del, curr->data);
+        }
+        if (pipe->pcb2 == pcb) {
+            pipe->pcb1 = NULL;
+
+            // if the other pcb is also NULL,
+            // mark it for deletion 
+            if (pipe->pcb1 == NULL)
+                list_add_last(to_del, curr->data);
+        }
+        curr = curr->next;
+    }
+    curr = to_del->first;
+    while (curr != NULL) {
+        delete_pipe(((pipe_t *)curr->data)->id);
+        curr = curr->next;
+    }
+    list_free(&to_del, NULL);
     return PIPE_SUCCESS;
 }
