@@ -113,7 +113,11 @@ int pipe_release(uint32_t id, PCB_t *pcb) {
     if (pipe->pcb1 != pcb && pipe->pcb2 != pcb)
         return PIPE_UNAUTHORIZED_ACCESS;
     
-    wake_process_on_pipe(pipe->current_owner == pipe->pcb1 ? pipe->pcb2 : pipe->pcb1);
+    if (pipe->current_owner == pipe->pcb1 && pipe->pcb2 != NULL) {
+        wake_process_on_pipe(pipe->pcb2);
+    } else if (pipe->current_owner == pipe->pcb2 && pipe->pcb1 != NULL) {
+        wake_process_on_pipe(pipe->pcb1);
+    }
 
     pipe->locked = 0;
     pipe->buff_index = 0; // so the reader/writer can start from the beginning
