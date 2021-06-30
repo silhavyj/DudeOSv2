@@ -288,6 +288,21 @@ uint32_t get_kernel_ESP() {
     return kernel_ESP;
 }
 
+void block_process_on_pipe() {
+    running_process->state = PROCESS_STATE_WAITING;
+    list_remove_data(ready_processes, (void *)running_process->pid, NULL);
+    list_add_last(waiting_processes, (void *)running_process->pid);
+}
+
+void wake_process_on_pipe(PCB_t *pcb) {
+    if (pcb == NULL)
+        return;
+    list_remove_data(waiting_processes, (void *)pcb->pid, NULL);
+    pcb->state = PROCESS_STATE_READY;
+    list_add_first(ready_processes, (void *)pcb->pid);
+    set_process_as_ready(running_process);
+}
+
 void keyboard_ask_resource() {
     running_process->state = PROCESS_STATE_WAITING;
     list_remove_data(ready_processes, (void *)running_process->pid, NULL);

@@ -125,8 +125,10 @@ void list_remove_data(list_t *list, void *data, void(*remove_elem_func)(void *))
     list_node_t *curr = list->first;
     
     while (curr != NULL) {
-        if (curr->data == data)
+        if (curr->data == data) {
             list_remove(list, index, remove_elem_func);
+            return;
+        }
         curr = curr->next;
         index++;
     }

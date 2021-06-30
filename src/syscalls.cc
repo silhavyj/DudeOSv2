@@ -7,6 +7,7 @@
 #include <paging.h>
 #include <support.h>
 #include <stdlib/memory.h>
+#include <ipc.h>
 
 void handle_systemcall(int_registers_t *regs) {
     switch (regs->eax) {
@@ -45,6 +46,21 @@ void handle_systemcall(int_registers_t *regs) {
         case SYSCALL_FORK:
             syscall_fork();
             break;
+        case SYSCALL_PIPE:
+            syscall_pipe();
+            break;
+        case SYSCALL_PIPE_WRITE:
+            syscall_pipe_write();
+            break;
+        case SYSCALL_PIPE_READ:
+            syscall_pipe_read();
+            break;
+        case SYSCALL_PIPE_RELEASE:
+            syscall_pipe_release();
+            break;
+        case SYSCALL_PIPE_CLOSE:
+            syscall_pipe_close();
+            break;
         default:
             kprintf("@---KERNEL--- unknown syscall\n");
             break;
@@ -53,6 +69,7 @@ void handle_systemcall(int_registers_t *regs) {
 
 void syscall_exit() {
     PCB_t *pcb = get_running_process();
+    delete_pcb_from_all_pipes(pcb);
     kill_process(pcb);
 }
 
@@ -92,9 +109,9 @@ void syscall_exec_program() {
     PCB_t *pcb = get_running_process();
     pcb->registers.EAX = (uint32_t)create_process((char *)pcb->registers.EBX);
 
+    set_process_to_run_next(pcb);
     if (pcb->registers.EAX != NULL)
-        set_process_as_ready((PCB_t *)pcb->registers.EAX);
-    set_process_as_ready(pcb);
+        set_process_to_run_next((PCB_t *)pcb->registers.EAX);
 }
 
 // terminates process that's pcb is in EBX
@@ -105,6 +122,7 @@ void syscall_terminate_process() {
         pcb->registers.EAX = 1;
     else {
         pcb->registers.EAX = 0;
+        delete_pcb_from_all_pipes((PCB_t *)pcb->registers.EBX);
         kill_process((PCB_t *)pcb->registers.EBX);
     }
 }
@@ -135,12 +153,81 @@ void syscall_fork() {
     // copy the content of the registers
     memcpy((char *)&child->registers, (char *)&pcb->registers, sizeof(regs_t));
 
-    pcb->registers.EAX = 1;     // you're the parent
-    child->registers.EAX = 0;   // you're the child
+    pcb->registers.EAX = 1;   // you're the parent
+    child->registers.EAX = 0; // you're the child
 
     // once we're done - enable paging again
     _enable_paging();
 
     set_process_to_run_next(pcb);
     set_process_to_run_next(child);
+}
+
+void syscall_pipe() {
+    PCB_t *pcb = get_running_process();
+    pcb->registers.EAX = create_pipe(pcb->registers.EBX, pcb);
+    set_process_to_run_next(pcb);
+}
+
+void syscall_pipe_write() {
+    PCB_t *pcb = get_running_process();
+    int pipe_id = pcb->registers.EBX;
+    int pipe_state = verify_pipe_access(pipe_id, pcb);
+    if (pipe_state != PIPE_SUCCESS) {
+        syscall_exit(); // kill the process if it's trying to access someone else's pipe 
+        switch_process();
+        return;
+    } else {
+        if (!is_pipe_empty(pipe_id, pcb) || is_pipe_locked(pipe_id, pcb)) {
+            pcb->registers.EAX = PIPE_BLOCKED;
+            block_process_on_pipe();
+            switch_process();
+        } else {
+            pcb->registers.EAX = pipe_write(pcb->registers.EBX, (char *)pcb->registers.ECX, pcb->registers.EDX, pcb);
+            set_process_to_run_next(pcb);
+        }
+    }
+}
+
+void syscall_pipe_read() {
+    PCB_t *pcb = get_running_process();
+    int pipe_id = pcb->registers.EBX;
+    int pipe_state = verify_pipe_access(pipe_id, pcb);
+    if (pipe_state != PIPE_SUCCESS) {
+        syscall_exit(); // kill the process if it's trying to access someone else's pipe 
+        switch_process();
+        return;
+    } else {
+        if (is_pipe_empty(pipe_id, pcb) || is_pipe_locked(pipe_id, pcb)) {
+            pcb->registers.EAX = PIPE_BLOCKED;
+            block_process_on_pipe();
+            switch_process();
+        } else {
+            pcb->registers.EAX = pipe_read(pipe_id, (char *)pcb->registers.ECX, pcb->registers.EDX, pcb);
+            set_process_to_run_next(pcb);
+        }
+    }
+}
+
+void syscall_pipe_release() {
+    PCB_t *pcb = get_running_process();
+    int pipe_id = pcb->registers.EBX;
+    if (verify_pipe_access(pipe_id, pcb) != PIPE_SUCCESS || get_pipe_holder(pipe_id) != pcb) {
+        syscall_exit(); // kill the process if it's trying to access someone else's pipe 
+        switch_process();
+        return;
+    }
+    pcb->registers.EAX = pipe_release(pcb->registers.EBX, pcb);
+    set_process_to_run_next(pcb);
+}
+
+void syscall_pipe_close() {
+    PCB_t *pcb = get_running_process();
+    int pipe_id = pcb->registers.EBX;
+    if (verify_pipe_access(pipe_id, pcb) != PIPE_SUCCESS) {
+        syscall_exit(); // kill the process if it's trying to access someone else's pipe 
+        switch_process();
+        return;
+    }
+    pcb->registers.EAX = remove_pcb_from_pipe(pipe_id, pcb);
 }

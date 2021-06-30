@@ -50,4 +50,7 @@ int process_exists(uint32_t addr);
 void keyboard_ask_resource();
 void keyboard_create_resource(char *input);
 
+void block_process_on_pipe();
+void wake_process_on_pipe(PCB_t *pcb);
+
 #endif

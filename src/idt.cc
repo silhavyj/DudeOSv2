@@ -128,7 +128,8 @@ void _int0xE_handler(uint32_t faulting_addr) {
     PCB_t *pcb = get_running_process();
     asm ("mov %0, %%esp" : : "r" (get_kernel_ESP()));
     set_color(FOREGROUND_LIGHTRED);
-    kprintf("#---ERROR--- Page fault %x: %s pid=0x%x\n", faulting_addr, pcb->name, pcb->pid);
+    kprintf("\n");
+    kprintf("#---ERROR--- Page fault %x: %s pid=%d\n", faulting_addr, pcb->name, pcb->pid);
     reset_color();
     kill_process(pcb);
     switch_process();
