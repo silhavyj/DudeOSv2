@@ -1,6 +1,7 @@
 #include <drivers/keyboard.h>
 #include <drivers/keymap.h>
 #include <drivers/screen.h>
+#include <drivers/ctrl_keyboard_shorcuts.h>
 #include <stdlib/memory.h>
 #include <process.h>
 
@@ -45,6 +46,12 @@ unsigned char convert_scan_code(uint8_t scan_code, uint8_t *pressed) {
                 return ENTER_KEY_CODE;
             return 0;
     }
+    if (ctrl_on && !shift_on) {
+        crl_keyboard_shortcut_t *ctr_short_cut = get_ctrl_shortcut(key_map[original_scancode]);
+        if (ctr_short_cut != NULL)
+            ctr_short_cut->handler();
+        return KEY_CODE_BACK_SPACE; // so the letter doesn't get displayed
+    }
     if (shift_on) {
         if (capslock_on)
             return key_map_caps_shifted[original_scancode];
@@ -65,7 +72,6 @@ void process_key(uint8_t scan_code) {
             keyboard_buff_pos--;
         }
     } else if (symbol == ENTER_KEY_CODE) {
-        // TODO wake up a process waiting for a keyboard interrupt
         kprintf("\n");
         keyboard_buffer[keyboard_buff_pos] = '\0';
         keyboard_create_resource(keyboard_buffer);
